@@ -53,7 +53,7 @@ Criar uma API para:
 | `currentStock` | Estoque atual disponível |
 | `minimumStock` | Estoque mínimo desejado |
 | `averageDailySales` | Média de vendas por dia |
-| `leadTimeDays` | Tempo (em dias) para reposição pelo fornecedor |
+| `leadTimeDays` | Tempo (em dias) que o fornecedor demora para entregar a peça |
 | `unitCost` | Custo unitário da peça |
 | `criticalityLevel` | Nível de criticidade (1 a 5) |
 
