@@ -1,90 +1,180 @@
-# :beer: Karhub | Desafio Backend
+# 🚚 Desafio Backend – Motor de Priorização de Reposição de Estoque
 
-Nossos devs gostam muito de cerveja, e por isso queremos criar nossa própria cervejeira :smirk::beer:.
+## 🧩 Contexto
 
-O desafio é servir a cerveja sempre gelada! Você sabia que existem vários estilos de cerveja (IPA, Weizenbier, Pilsens, etc)?
+Somos um distribuidor de autopeças. Diariamente precisamos decidir **quais peças devem ser priorizadas para reposição**, considerando:
 
-Sabia que cada estilo tem uma temperatura ideal de consumo? Isso mesmo, em uma temperatura ideal sua breja fica mais saborosa :open_mouth:!
+- Estoque limitado
+- Capital de giro limitado
+- Diferentes níveis de criticidade
+- Padrões de venda distintos
+- Tempo de reposição do fornecedor
 
-**Exemplo:**
+O objetivo é construir um microserviço capaz de:
 
-|     Estilo      | Temperatura Ideal para consumo |
-| :-------------: | :----------------------------: |
-|    Weissbier    |            -1° a 3°            |
-|     Pilsens     |            -2° a 4°            |
-|   Weizenbier    |            -4° a 6°            |
-|     Red ale     |            -5° a 5°            |
-| India pale ale  |            -6° a 7°            |
-|       IPA       |           -7° a 10°            |
-|     Dunkel      |            -8° a 2°            |
-| Imperial Stouts |           -10° a 13°           |
-|    Brown ale    |            0° a 14°            |
+1. Gerenciar peças em estoque
+2. Calcular automaticamente quais peças devem ser priorizadas para reposição
+3. Ordenar as peças por nível de urgência
 
-## Tarefas
+---
 
-### 1. Crie um microserviço para os estilos de cerveja
+# 🛠️ Requisitos Funcionais
 
-Precisamos que crie uma api que possamos listar, cadastrar, deletar e atualizar nossos estilos de cerveja e suas temperaturas(C.R.U.D).
+## 1️⃣ CRUD de Peças
 
-### 2. Criar um endpoint
+Criar uma API para:
 
-Para nos ajudar a criar nossa máquina cervejeira, desenvolva uma **API Restful** na qual, dada uma temperatura, ela nos devolva o estilo de cerveja mais adequado para aquela temperatura e uma playlist que contenha o nome desse estilo(use a api do [spotify](https://developer.spotify.com/documentation/web-api/) para buscar as playlist).
+- Criar peça
+- Listar peças
+- Atualizar peça
+- Remover peça
+- Buscar por categoria (opcional)
 
-**Regras de negócio**
-
-- Todo estilo de cerveja tem uma temperatura mínima e uma temperatura máxima.
-- O cálculo para selecionar o estilo de cerveja adequado: é qual estilo contém a média das suas temperaturas mais próxima do input dado pela api.(Se o input foi -2 e temos as cervejas Dunkel e Weissbier o estilo selecionado é o Dunkel).
-- Caso o resultado seja mais de um estilo de cerveja, devolver o estilo por ordem alfabética(entre Pilsens e IPA voltára IPA) e caso de empate na primeira letra, ordernar pela segunda e assim por diante.
-- Caso não tenha uma playlist que contenha o nome do estilo, retornar um HTTP Status que achar mais adequado.
-- A lista dada foi um exemplo, a api tem que estar pronta para receber mais estilos e mais temperaturas.
-
-Exemplo:
-
-**Entrada:**
+### 📦 Estrutura da Entidade
 
 ```json
 {
-  "temperature": -7
+  "id": "uuid",
+  "name": "Filtro de Óleo X",
+  "category": "engine",
+  "currentStock": 15,
+  "minimumStock": 20,
+  "averageDailySales": 4,
+  "leadTimeDays": 5,
+  "unitCost": 18.50,
+  "criticalityLevel": 3
 }
 ```
 
-**Saída**
+## 📝 Descrição dos Campos
+
+| Campo | Descrição |
+|--------|------------|
+| `currentStock` | Estoque atual disponível |
+| `minimumStock` | Estoque mínimo desejado |
+| `averageDailySales` | Média de vendas por dia |
+| `leadTimeDays` | Tempo (em dias) para reposição pelo fornecedor |
+| `unitCost` | Custo unitário da peça |
+| `criticalityLevel` | Nível de criticidade (1 a 5) |
+
+---
+
+## 🧠 Endpoint de Priorização
+
+Criar o endpoint:
+
+```GET /restock/priorities```
+
+Esse endpoint deve retornar as peças ordenadas por prioridade de reposição.
+
+---
+
+## 📐 Regras de Negócio
+
+### 1️⃣ Calcular Consumo Esperado Durante o Lead Time
+
+```expectedConsumption = averageDailySales * leadTimeDays```
+
+---
+
+### 2️⃣ Calcular Estoque Projetado
+
+```projectedStock = currentStock - expectedConsumption```
+
+---
+
+### 3️⃣ Identificar Necessidade de Reposição
+
+Uma peça precisa de reposição quando:
+```projectedStock < minimumStock```
+
+
+---
+
+### 4️⃣ Calcular Score de Prioridade
+
+O score de prioridade deve ser calculado da seguinte forma:
+
+```urgencyScore = (minimumStock - projectedStock) * criticalityLevel```
+
+
+Quanto maior o `urgencyScore`, maior a prioridade de reposição.
+
+---
+
+## 🟰 Critérios de Desempate
+
+Em caso de empate no `urgencyScore`, aplicar:
+
+1. Maior `criticalityLevel`
+2. Maior `averageDailySales`
+3. Ordem alfabética pelo nome da peça
+
+---
+
+## 📤 Exemplo de Resposta
 
 ```json
 {
-  "beerStyle": "IPA",
-  "playlist": {
-    "name": "IPARTY",
-    "tracks": [
-      {
-        "name": "Lua de Cristal",
-        "artist": "Xuxa",
-        "link": "https: //open.spotify.com/artist/21451j1KhjAiaYKflxBjr1"
-      },
-      {
-        "name": "Vogue",
-        "artist": "Madonna",
-        "link": "https: //open.spotify.com/artist/21451j1Khj123YKflxBjr1"
-      }
-    ]
-  }
+  "priorities": [
+    {
+      "partId": "uuid-1",
+      "name": "Filtro de Óleo X",
+      "currentStock": 15,
+      "projectedStock": 5,
+      "minimumStock": 20,
+      "urgencyScore": 45
+    },
+    {
+      "partId": "uuid-2",
+      "name": "Pastilha de Freio Y",
+      "currentStock": 8,
+      "projectedStock": -2,
+      "minimumStock": 10,
+      "urgencyScore": 36
+    }
+  ]
 }
 ```
 
-### 3. O que esperamos:
+### 📌 Regras Gerais
 
-- Crie uma documentação e explique como como rodar localmente.
-- O teste deverá ser feito utilizando Node ou Golang. Sinta-se a vontade para usar qualquer framework ou tecnologia em ambas linguagens.
+- Não utilizar APIs externas.
+- O sistema deve estar preparado para suportar centenas ou milhares de peças.
+- A solução deve permitir futura troca de banco de dados.
+- O cálculo de prioridade deve estar isolado da camada HTTP.
+- Tratar corretamente casos de estoque negativo.
 
-## O que iremos avaliar
+### 🎯 O Que Será Avaliado
+- 🧠 Modelagem de Domínio
+- Clareza das entidades
+- Separação de responsabilidades
+- Organização das regras de negócio
 
-Nosso time irá avaliar:
+### 🧪 Testes
+- Testes unitários do cálculo de prioridade
+- Testes de cenários extremos (estoque negativo, venda zero, lead time alto)
 
-- **Desempenho**
-- **Testes**
-- **Manutenabilidade**
-- **Separação de responsabilidades**
+### 🏗️ Arquitetura
+- Uso adequado de camadas (ex: Controller, Service, Domain, Repository)
+- Código limpo e organizado
+- Facilidade de manutenção
 
-Fique a vontade para usar Over Engineering, aplique DDD, Clean arch, mensageria, cache, TUDO QUE VOCÊ QUISER!!!
+### 🧰 Tecnologias
 
-Seu código diz muito sobre você, então relaxa, o que queremos é te conhecer melhor através de seu código :wink:.
+Pode ser desenvolvido utilizando:
+
+- Node.js
+- Golang
+- Frameworks e bibliotecas são livres
+
+### 📄 Entrega
+
+O projeto deve conter:
+
+- Código-fonte organizado
+- README com instruções para rodar localmente
+- Exemplos de requisição
+- Testes automatizados
+
+Boa implementação 🚀
