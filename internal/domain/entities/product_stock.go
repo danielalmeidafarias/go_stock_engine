@@ -1,7 +1,7 @@
 package entities
 
 type ProductStock struct {
-	ID                string           `json:"id"`
+	ID                *string          `json:"id"`
 	Name              string           `json:"name"`
 	Category          ProductCategory  `json:"category"`
 	CurrentStock      int              `json:"currentStock"`
