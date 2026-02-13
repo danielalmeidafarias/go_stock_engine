@@ -9,3 +9,12 @@ const (
 	VeryHigh
 	Critical
 )
+
+func IsValidCriticalityLevel(c CriticalityLevel) bool {
+	switch c {
+	case Low, Moderate, High, VeryHigh, Critical:
+		return true
+	default:
+		return false
+	}
+}

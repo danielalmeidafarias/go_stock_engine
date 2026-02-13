@@ -10,14 +10,16 @@ const (
 )
 
 type Error struct {
-	Err     error
 	ErrCode ErrorCode
 	Message string
 }
 
-func NewError(err error, errCode ErrorCode, message string) *Error {
+func (err *Error) Error() string {
+	return err.Message
+}
+
+func NewError(message string, errCode ErrorCode) *Error {
 	return &Error{
-		Err:     err,
 		ErrCode: errCode,
 		Message: message,
 	}

@@ -2,31 +2,46 @@ package usecases
 
 import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
+	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
 
 type CreateProductStockUseCase struct {
-	repo *repository.IProductStockRepository
+	repo repository.IProductStockRepository
 }
 
-func NewCreateProductStockUseCase(repo *repository.IProductStockRepository) *CreateProductStockUseCase {
+func NewCreateProductStockUseCase(repo repository.IProductStockRepository) *CreateProductStockUseCase {
 	return &CreateProductStockUseCase{
 		repo: repo,
 	}
 }
 
-// Validar se isso faz sentido, mas na minha cabeça, os enums devem ser recebidos como strings e int aqui
 type CreateProductStockDTO struct {
-	Name              string  `json:"name"`
-	Category          string  `json:"category"`
-	CurrentStock      int     `json:"currentStock"`
-	MinimumStock      int     `json:"minimumStock"`
-	AverageDailySales int     `json:"averageDailySales"`
-	LeadTimeDays      int     `json:"leadTimeDays"`
-	UnitCost          float64 `json:"unitCost"`
-	CriticalityLevel  int     `json:"criticalityLevel"`
+	Name              string
+	Category          string
+	CurrentStock      int
+	MinimumStock      int
+	AverageDailySales int
+	LeadTimeDays      int
+	UnitCost          float64
+	CriticalityLevel  int
 }
 
-func (uc *CreateProductStockUseCase) Execute(pagination domain.Pagination) {
+func (uc *CreateProductStockUseCase) Execute(dto CreateProductStockDTO) (string, *domain.Error) {
+	productStock, err := entities.NewProductStock(
+		nil,
+		dto.Name,
+		entities.ProductCategory(dto.Category),
+		dto.CurrentStock,
+		dto.MinimumStock,
+		dto.AverageDailySales,
+		dto.LeadTimeDays,
+		dto.UnitCost,
+		entities.CriticalityLevel(dto.CriticalityLevel),
+	)
+	if err != nil {
+		return "", err
+	}
 
+	return uc.repo.Create(productStock)
 }
