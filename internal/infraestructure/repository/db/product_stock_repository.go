@@ -2,7 +2,6 @@ package db
 
 import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"
 	"gorm.io/gorm"
 )
 
@@ -19,7 +18,7 @@ func NewProductStockRepository(gorm *gorm.DB, errMapper ErrorMapper) *ProductSto
 	return &ProductStockRepository{db: gorm, dbErrMapper: errMapper}
 }
 
-func (r *ProductStockRepository) Create(in *entities.ProductStock) (string, *domain.Error) {
+func (r *ProductStockRepository) Create(in *domain.ProductStock) (string, *domain.Error) {
 	model := MapProductStockToModel(in)
 
 	if err := r.db.Create(model).Error; err != nil {
@@ -29,7 +28,7 @@ func (r *ProductStockRepository) Create(in *entities.ProductStock) (string, *dom
 	return model.ID, nil
 }
 
-func (r *ProductStockRepository) Update(in *entities.ProductStock) *domain.Error {
+func (r *ProductStockRepository) Update(in *domain.ProductStock) *domain.Error {
 	model := MapProductStockToModel(in)
 
 	result := r.db.Save(model)
@@ -44,7 +43,7 @@ func (r *ProductStockRepository) Update(in *entities.ProductStock) *domain.Error
 	return nil
 }
 
-func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*entities.ProductStock, *domain.Error) {
+func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	var models []ProductStockModel
 
 	query := r.db.Model(&ProductStockModel{})
@@ -58,7 +57,7 @@ func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*entit
 		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to list products")
 	}
 
-	result := make([]*entities.ProductStock, len(models))
+	result := make([]*domain.ProductStock, len(models))
 	for i := range models {
 		result[i] = models[i].ToDomain()
 	}
@@ -66,7 +65,7 @@ func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*entit
 	return result, nil
 }
 
-func (r *ProductStockRepository) GetOneByID(id string) (*entities.ProductStock, *domain.Error) {
+func (r *ProductStockRepository) GetOneByID(id string) (*domain.ProductStock, *domain.Error) {
 	var model ProductStockModel
 
 	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
@@ -76,7 +75,7 @@ func (r *ProductStockRepository) GetOneByID(id string) (*entities.ProductStock, 
 	return model.ToDomain(), nil
 }
 
-func (r *ProductStockRepository) GetByCategory(category entities.ProductCategory, pagination *domain.Pagination) ([]*entities.ProductStock, *domain.Error) {
+func (r *ProductStockRepository) GetByCategory(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	var models []ProductStockModel
 
 	query := r.db.Where("category = ?", string(category))
@@ -90,7 +89,7 @@ func (r *ProductStockRepository) GetByCategory(category entities.ProductCategory
 		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to get products by category")
 	}
 
-	result := make([]*entities.ProductStock, len(models))
+	result := make([]*domain.ProductStock, len(models))
 	for i := range models {
 		result[i] = models[i].ToDomain()
 	}

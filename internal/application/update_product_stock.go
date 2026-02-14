@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
 
@@ -57,10 +56,10 @@ func (uc *UpdateProductStockUseCase) Execute(dto UpdateProductStockDTO) *domain.
 	}
 
 	if dto.CriticalityLevel != nil {
-		p.CriticalityLevel = entities.CriticalityLevel(*dto.CriticalityLevel)
+		p.CriticalityLevel = domain.CriticalityLevel(*dto.CriticalityLevel)
 	}
 
-	p, err = entities.NewProductStock(
+	p, err = domain.NewProductStock(
 		&dto.ID,
 		p.Name,
 		p.Category,

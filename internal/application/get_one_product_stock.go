@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
 
@@ -16,7 +15,7 @@ func NewGetOneProductStockUseCase(repo repository.IProductStockRepository) *GetO
 	}
 }
 
-func (uc *GetOneProductStockUseCase) Execute(id string) (*entities.ProductStock, *domain.Error) {
+func (uc *GetOneProductStockUseCase) Execute(id string) (*domain.ProductStock, *domain.Error) {
 	if id == "" {
 		return nil, domain.NewError("id is required", domain.ErrBadRequest)
 	}

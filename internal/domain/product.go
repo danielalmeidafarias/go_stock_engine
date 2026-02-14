@@ -1,8 +1,4 @@
-package entities
-
-import (
-	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
-)
+package domain
 
 type ProductStock struct {
 	ID                *string
@@ -23,15 +19,23 @@ func NewProductStock(
 	currentStock, minimumStock, averageDailySales, leadTimeDays int,
 	unitCost float64,
 	criticalityLevel CriticalityLevel,
-) (*ProductStock, *domain.Error) {
+) (*ProductStock, *Error) {
 
 	errValidation := func() string {
 		if name == "" {
 			return "name is required"
 		}
 
-		if currentStock < 0 || minimumStock < 0 || averageDailySales < 0 || leadTimeDays < 0 {
-			return "numeric fields must be non-negative"
+		if minimumStock < 0 {
+			return "minimum stock must be non-negative"
+		}
+
+		if averageDailySales < 0 {
+			return "average daily sales must be non-negative"
+		}
+
+		if leadTimeDays < 0 {
+			return "lead time must be non-negative"
 		}
 
 		if unitCost <= 0 {
@@ -50,7 +54,7 @@ func NewProductStock(
 	}()
 
 	if errValidation != "" {
-		return nil, domain.NewError(errValidation, domain.ErrBadRequest)
+		return nil, NewError(errValidation, ErrBadRequest)
 	}
 
 	return &ProductStock{

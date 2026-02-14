@@ -2,7 +2,6 @@ package usecases
 
 import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
 
@@ -23,10 +22,10 @@ type GetByCategoryDTO struct {
 	Pagination domain.Pagination
 }
 
-func (uc *GetByCategoryProductStockUseCase) Execute(dto GetByCategoryDTO) ([]*entities.ProductStock, *domain.Error) {
-	category := entities.ProductCategory(dto.Category)
+func (uc *GetByCategoryProductStockUseCase) Execute(dto GetByCategoryDTO) ([]*domain.ProductStock, *domain.Error) {
+	category := domain.ProductCategory(dto.Category)
 
-	if !entities.IsValidProductCategory(category) {
+	if !domain.IsValidProductCategory(category) {
 		return nil, domain.NewError("invalid product category", domain.ErrBadRequest)
 	}
 

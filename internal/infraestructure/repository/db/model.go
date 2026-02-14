@@ -1,7 +1,7 @@
 package db
 
 import (
-	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"
+	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 )
 
 type ProductStockModel struct {
@@ -16,22 +16,22 @@ type ProductStockModel struct {
 	CriticalityLevel  int     `gorm:"not null"`
 }
 
-func (m *ProductStockModel) ToDomain() *entities.ProductStock {
+func (m *ProductStockModel) ToDomain() *domain.ProductStock {
 	id := m.ID
-	return &entities.ProductStock{
+	return &domain.ProductStock{
 		ID:                &id,
 		Name:              m.Name,
-		Category:          entities.ProductCategory(m.Category),
+		Category:          domain.ProductCategory(m.Category),
 		CurrentStock:      m.CurrentStock,
 		MinimumStock:      m.MinimumStock,
 		AverageDailySales: m.AverageDailySales,
 		LeadTimeDays:      m.LeadTimeDays,
 		UnitCost:          m.UnitCost,
-		CriticalityLevel:  entities.CriticalityLevel(m.CriticalityLevel),
+		CriticalityLevel:  domain.CriticalityLevel(m.CriticalityLevel),
 	}
 }
 
-func MapProductStockToModel(e *entities.ProductStock) *ProductStockModel {
+func MapProductStockToModel(e *domain.ProductStock) *ProductStockModel {
 	model := &ProductStockModel{
 		Name:              e.Name,
 		Category:          string(e.Category),
