@@ -12,18 +12,29 @@ services:
     volumes:
       - db_data:/var/lib/postgresql/data
       - ./internal/infraestructure/repository/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   app:
     build: .
     container_name: inventory_app
+    restart: on-failure
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       POSTGRES_HOST: db
       POSTGRES_PORT: "5432"
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: example
       POSTGRES_DB: postgres
+      REPOSITORY_TYPE: POSTGRES
+      HANDLER_TYPE: HTTP
+      PAGINATION_DEFAULT_LIMIT: "20"
+      PAGINATION_MAX_LIMIT: "100"
     ports:
       - "8080:8080"
 

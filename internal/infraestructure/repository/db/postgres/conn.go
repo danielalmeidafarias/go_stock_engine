@@ -13,9 +13,8 @@ import (
 )
 
 func NewPostgresConnection() *gorm.DB {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Erro ao carregar o .env")
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env not found, using system environment variables")
 	}
 
 	host := os.Getenv("POSTGRES_HOST")

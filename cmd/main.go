@@ -8,9 +8,8 @@ import (
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Erro ao carregar o .env")
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env not found, using system environment variables")
 	}
 
 	repositoryType := RepositoryType(os.Getenv("REPOSITORY_TYPE"))
