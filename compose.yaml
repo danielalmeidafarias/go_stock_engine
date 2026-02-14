@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16
+    container_name: inventory_db
     restart: always
     shm_size: 128mb
     environment:
@@ -11,12 +12,23 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./internal/infraestructure/repository/db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
       timeout: 5s
       retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: inventory_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
 
   app:
     build: .
@@ -35,6 +47,9 @@ services:
       HANDLER_TYPE: HTTP
       PAGINATION_DEFAULT_LIMIT: "20"
       PAGINATION_MAX_LIMIT: "100"
+      PRIORITY_NEGATIVE_STOCK_FACTOR: "1.5"
+      PRIORITY_LEAD_TIME_FACTOR: "1.2"
+      PRIORITY_ZERO_SALES_FACTOR: "0.5"
     ports:
       - "8080:8080"
 
