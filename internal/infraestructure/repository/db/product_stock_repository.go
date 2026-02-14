@@ -11,11 +11,11 @@ type ErrorMapper interface {
 }
 
 type ProductStockRepository struct {
-	db          gorm.DB
+	db          *gorm.DB
 	dbErrMapper ErrorMapper
 }
 
-func NewProductStockRepository(gorm gorm.DB, errMapper ErrorMapper) *ProductStockRepository {
+func NewProductStockRepository(gorm *gorm.DB, errMapper ErrorMapper) *ProductStockRepository {
 	return &ProductStockRepository{db: gorm, dbErrMapper: errMapper}
 }
 

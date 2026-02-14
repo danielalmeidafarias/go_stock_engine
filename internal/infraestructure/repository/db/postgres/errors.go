@@ -25,7 +25,7 @@ const (
 	pgInvalidTextRepresentation = "22P02"
 )
 
-func (errMapper *PostgresErrMapper) MapPostgresErrorDomain(err error, context string) *domain.Error {
+func (errMapper *PostgresErrMapper) MapErrorToDomain(err error, context string) *domain.Error {
 	pgErr, _ := err.(*pgconn.PgError)
 	if pgErr != nil {
 		switch pgErr.Code {

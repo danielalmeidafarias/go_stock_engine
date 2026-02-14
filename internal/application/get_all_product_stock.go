@@ -7,19 +7,19 @@ import (
 )
 
 type GetAllProductStockUseCase struct {
-	repo   repository.IProductStockRepository
-	config domain.AppConfig
+	repo             repository.IProductStockRepository
+	paginationConfig domain.PaginationConfig
 }
 
-func NewGetAllProductStockUseCase(repo repository.IProductStockRepository, appConfig domain.AppConfig) *GetAllProductStockUseCase {
+func NewGetAllProductStockUseCase(repo repository.IProductStockRepository, paginationConfig domain.PaginationConfig) *GetAllProductStockUseCase {
 	return &GetAllProductStockUseCase{
-		repo:   repo,
-		config: appConfig,
+		repo:             repo,
+		paginationConfig: paginationConfig,
 	}
 }
 
 func (uc *GetAllProductStockUseCase) Execute(pagination domain.Pagination) ([]*entities.ProductStock, *domain.Error) {
-	uc.config.ApplyPaginationConfig(&pagination)
+	uc.paginationConfig.ApplyPaginationConfig(&pagination)
 
 	products, err := uc.repo.GetAll(&pagination)
 	if err != nil {

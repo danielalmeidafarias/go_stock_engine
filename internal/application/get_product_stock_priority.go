@@ -10,14 +10,14 @@ import (
 )
 
 type GetProductPriorityUseCase struct {
-	repo   repository.IProductStockRepository
-	config domain.AppConfig
+	repo             repository.IProductStockRepository
+	paginationConfig domain.PaginationConfig
 }
 
-func NewGetProductPriorityUseCase(repo repository.IProductStockRepository, config domain.AppConfig) *GetProductPriorityUseCase {
+func NewGetProductPriorityUseCase(repo repository.IProductStockRepository, paginationConfig domain.PaginationConfig) *GetProductPriorityUseCase {
 	return &GetProductPriorityUseCase{
-		repo:   repo,
-		config: config,
+		repo:             repo,
+		paginationConfig: paginationConfig,
 	}
 }
 
@@ -56,7 +56,7 @@ func (uc *GetProductPriorityUseCase) Execute(pagination domain.Pagination) ([]Pr
 		return priorityList[i].UrgencyScore > priorityList[j].UrgencyScore
 	})
 
-	uc.config.ApplyPaginationConfig(&pagination)
+	uc.paginationConfig.ApplyPaginationConfig(&pagination)
 
 	offset := (pagination.Page - 1) * pagination.Limit
 	if offset >= len(priorityList) {

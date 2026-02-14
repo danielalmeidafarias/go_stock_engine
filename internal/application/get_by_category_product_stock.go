@@ -7,14 +7,14 @@ import (
 )
 
 type GetByCategoryProductStockUseCase struct {
-	repo   repository.IProductStockRepository
-	config domain.AppConfig
+	repo             repository.IProductStockRepository
+	paginationConfig domain.PaginationConfig
 }
 
-func NewGetByCategoryProductStockUseCase(repo repository.IProductStockRepository, config domain.AppConfig) *GetByCategoryProductStockUseCase {
+func NewGetByCategoryProductStockUseCase(repo repository.IProductStockRepository, config domain.PaginationConfig) *GetByCategoryProductStockUseCase {
 	return &GetByCategoryProductStockUseCase{
-		repo:   repo,
-		config: config,
+		repo:             repo,
+		paginationConfig: config,
 	}
 }
 
@@ -30,7 +30,7 @@ func (uc *GetByCategoryProductStockUseCase) Execute(dto GetByCategoryDTO) ([]*en
 		return nil, domain.NewError("invalid product category", domain.ErrBadRequest)
 	}
 
-	uc.config.ApplyPaginationConfig(&dto.Pagination)
+	uc.paginationConfig.ApplyPaginationConfig(&dto.Pagination)
 
 	products, err := uc.repo.GetByCategory(category, &dto.Pagination)
 	if err != nil {
