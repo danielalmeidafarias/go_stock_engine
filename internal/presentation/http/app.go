@@ -4,6 +4,8 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type GinApp struct {
@@ -30,6 +32,8 @@ func NewGinApp(handler *ProductStockHandler) GinApp {
 	}
 
 	r.GET("/restock/priorities", handler.GetRestockPriorities)
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return GinApp{
 		gin: r,

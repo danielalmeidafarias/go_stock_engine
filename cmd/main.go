@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/danielalmeidafarias/go_stock_engine/docs"
 	"github.com/joho/godotenv"
 )
 
