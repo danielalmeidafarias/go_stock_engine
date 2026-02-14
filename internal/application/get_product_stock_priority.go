@@ -41,16 +41,15 @@ func (uc *GetProductPriorityUseCase) Execute(pagination domain.Pagination) ([]Pr
 
 	for _, p := range products {
 		wg.Go(func() {
-
-			p := p
 			stockPriority := getStockPriority(p)
-			mu.Lock()
-			priorityList = append(priorityList, *stockPriority)
-			mu.Unlock()
 
+			if stockPriority.IsRepositionNeeded {
+				mu.Lock()
+				priorityList = append(priorityList, *stockPriority)
+				mu.Unlock()
+			}
 		})
 	}
-
 	wg.Wait()
 
 	sort.Slice(priorityList, func(i, j int) bool {
@@ -60,15 +59,11 @@ func (uc *GetProductPriorityUseCase) Execute(pagination domain.Pagination) ([]Pr
 	uc.config.ApplyPaginationConfig(&pagination)
 
 	offset := (pagination.Page - 1) * pagination.Limit
-	end := offset + pagination.Limit
-
 	if offset >= len(priorityList) {
 		return []ProductStockPriority{}, nil
 	}
 
-	if end > len(priorityList) {
-		end = len(priorityList)
-	}
+	end := min(offset+pagination.Limit, len(priorityList))
 
 	return priorityList[offset:end], nil
 }
