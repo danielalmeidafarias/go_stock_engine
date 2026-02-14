@@ -2,6 +2,7 @@ package usecases
 
 import (
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
@@ -24,7 +25,6 @@ func NewGetProductPriorityUseCase(repo repository.IProductStockRepository, pagin
 type ProductStockPriority struct {
 	ExpectedConsumption int
 	ProjectedStock      int
-	IsRepositionNeeded  bool
 	UrgencyScore        int
 	ProductStock        *entities.ProductStock
 }
@@ -41,11 +41,18 @@ func (uc *GetProductPriorityUseCase) Execute(pagination domain.Pagination) ([]Pr
 
 	for _, p := range products {
 		wg.Go(func() {
-			stockPriority := getStockPriority(p)
+			expectedConsumption := p.AverageDailySales * p.LeadTimeDays
+			projectedStock := p.CurrentStock - expectedConsumption
+			isRepositionNeeded := projectedStock < p.MinimumStock
 
-			if stockPriority.IsRepositionNeeded {
+			if isRepositionNeeded {
 				mu.Lock()
-				priorityList = append(priorityList, *stockPriority)
+				priorityList = append(priorityList, ProductStockPriority{
+					ProductStock:        p,
+					ExpectedConsumption: expectedConsumption,
+					ProjectedStock:      projectedStock,
+					UrgencyScore:        (p.MinimumStock - projectedStock) * int(p.CriticalityLevel),
+				})
 				mu.Unlock()
 			}
 		})
@@ -53,30 +60,25 @@ func (uc *GetProductPriorityUseCase) Execute(pagination domain.Pagination) ([]Pr
 	wg.Wait()
 
 	sort.Slice(priorityList, func(i, j int) bool {
-		return priorityList[i].UrgencyScore > priorityList[j].UrgencyScore
+		x := priorityList[i]
+		y := priorityList[j]
+
+		if x.UrgencyScore != y.UrgencyScore {
+			return x.UrgencyScore > y.UrgencyScore
+		}
+
+		if x.ProductStock.CriticalityLevel != y.ProductStock.CriticalityLevel {
+			return x.ProductStock.CriticalityLevel > y.ProductStock.CriticalityLevel
+		}
+
+		if x.ProductStock.AverageDailySales != y.ProductStock.AverageDailySales {
+			return x.ProductStock.AverageDailySales > y.ProductStock.AverageDailySales
+		}
+
+		return strings.ToLower(x.ProductStock.Name) < strings.ToLower(y.ProductStock.Name)
 	})
 
-	uc.paginationConfig.ApplyPaginationConfig(&pagination)
+	domain.ApplyPaginationRules(&pagination, uc.paginationConfig)
 
-	offset := (pagination.Page - 1) * pagination.Limit
-	if offset >= len(priorityList) {
-		return []ProductStockPriority{}, nil
-	}
-
-	end := min(offset+pagination.Limit, len(priorityList))
-
-	return priorityList[offset:end], nil
-}
-
-func getStockPriority(p *entities.ProductStock) *ProductStockPriority {
-	expectedConsumption := p.AverageDailySales * p.LeadTimeDays
-	projectedStock := p.CurrentStock - expectedConsumption
-
-	return &ProductStockPriority{
-		ProductStock:        p,
-		ExpectedConsumption: expectedConsumption,
-		ProjectedStock:      projectedStock,
-		IsRepositionNeeded:  projectedStock < p.MinimumStock,
-		UrgencyScore:        (p.MinimumStock - projectedStock) * int(p.CriticalityLevel),
-	}
+	return domain.PaginatedSlice(priorityList, &pagination), nil
 }

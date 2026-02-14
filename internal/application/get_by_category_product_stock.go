@@ -30,7 +30,7 @@ func (uc *GetByCategoryProductStockUseCase) Execute(dto GetByCategoryDTO) ([]*en
 		return nil, domain.NewError("invalid product category", domain.ErrBadRequest)
 	}
 
-	uc.paginationConfig.ApplyPaginationConfig(&dto.Pagination)
+	domain.ApplyPaginationRules(&dto.Pagination, uc.paginationConfig)
 
 	products, err := uc.repo.GetByCategory(category, &dto.Pagination)
 	if err != nil {

@@ -19,7 +19,7 @@ func NewGetAllProductStockUseCase(repo repository.IProductStockRepository, pagin
 }
 
 func (uc *GetAllProductStockUseCase) Execute(pagination domain.Pagination) ([]*entities.ProductStock, *domain.Error) {
-	uc.paginationConfig.ApplyPaginationConfig(&pagination)
+	domain.ApplyPaginationRules(&pagination, uc.paginationConfig)
 
 	products, err := uc.repo.GetAll(&pagination)
 	if err != nil {
