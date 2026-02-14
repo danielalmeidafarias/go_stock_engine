@@ -34,14 +34,19 @@ const (
 	HTTP HandlerType = "HTTP"
 )
 
-func AppHandlerFactory(handlerType HandlerType, paginationConfig domain.PaginationConfig, repo repository.IProductStockRepository) domain.App {
+func AppHandlerFactory(
+	handlerType HandlerType,
+	paginationConfig domain.PaginationConfig,
+	repo repository.IProductStockRepository,
+	priorityPolicy domain.PriorityPolicy,
+) domain.App {
 	createUC := usecases.NewCreateProductStockUseCase(repo)
 	getAllUC := usecases.NewGetAllProductStockUseCase(repo, paginationConfig)
 	getOneUC := usecases.NewGetOneProductStockUseCase(repo)
 	updateUC := usecases.NewUpdateProductStockUseCase(repo)
 	deleteUC := usecases.NewDeleteProductStockUseCase(repo)
 	getByCategoryUC := usecases.NewGetByCategoryProductStockUseCase(repo, paginationConfig)
-	getPriorityUC := usecases.NewGetProductPriorityUseCase(repo, paginationConfig)
+	getPriorityUC := usecases.NewGetProductPriorityUseCase(repo, paginationConfig, priorityPolicy)
 
 	switch handlerType {
 	case HTTP:
@@ -76,5 +81,32 @@ func NewPaginationConfig(paginationDefaultLimitStr, paginationMaxLimitStr string
 	return domain.PaginationConfig{
 		DefaultLimit: paginationDefaultLimit,
 		MaxLimit:     paginationMaxLimit,
+	}
+}
+
+func NewPriorityPolicy(
+	negativeStockFactorStr,
+	leadTimeFactorStr,
+	zeroSalesFactorStr string,
+) domain.PriorityPolicy {
+	negativeStockFactor, err := strconv.ParseFloat(negativeStockFactorStr, 64)
+	if err != nil {
+		panic("invalid PRIORITY_NEGATIVE_STOCK_FACTOR")
+	}
+
+	leadTimeFactor, err := strconv.ParseFloat(leadTimeFactorStr, 64)
+	if err != nil {
+		panic("invalid PRIORITY_LEAD_TIME_FACTOR")
+	}
+
+	zeroSalesFactor, err := strconv.ParseFloat(zeroSalesFactorStr, 64)
+	if err != nil {
+		panic("invalid PRIORITY_ZERO_SALES_FACTOR")
+	}
+
+	return domain.PriorityPolicy{
+		NegativeStockFactor: negativeStockFactor,
+		LeadTimeFactor:      leadTimeFactor,
+		ZeroSalesFactor:     zeroSalesFactor,
 	}
 }
