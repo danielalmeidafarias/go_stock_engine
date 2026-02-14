@@ -1,180 +1,162 @@
-# 🚚 Desafio Backend – Motor de Priorização de Reposição de Estoque
+# Stock Engine API
 
-## 🧩 Contexto
+Microservice for managing product stock and calculating restock priorities.
 
-Somos um distribuidor de autopeças. Diariamente precisamos decidir **quais peças devem ser priorizadas para reposição**, considerando:
+## Requirements
 
-- Estoque limitado
-- Capital de giro limitado
-- Diferentes níveis de criticidade
-- Padrões de venda distintos
-- Tempo de reposição do fornecedor
-
-O objetivo é construir um microserviço capaz de:
-
-1. Gerenciar peças em estoque
-2. Calcular automaticamente quais peças devem ser priorizadas para reposição
-3. Ordenar as peças por nível de urgência
+- **With Docker:** Docker and Docker Compose
+- **Without Docker:** Go 1.25+, PostgreSQL 16+
 
 ---
 
-# 🛠️ Requisitos Funcionais
+## Running with Docker
 
-## 1️⃣ CRUD de Peças
-
-Criar uma API para:
-
-- Criar peça
-- Listar peças
-- Atualizar peça
-- Remover peça
-- Buscar por categoria (opcional)
-
-### 📦 Estrutura da Entidade
-
-```json
-{
-  "id": "uuid",
-  "name": "Filtro de Óleo X",
-  "category": "engine",
-  "currentStock": 15,
-  "minimumStock": 20,
-  "averageDailySales": 4,
-  "leadTimeDays": 5,
-  "unitCost": 18.50,
-  "criticalityLevel": 3
-}
+```bash
+docker compose up --build
 ```
 
-## 📝 Descrição dos Campos
+The API will be available at `http://localhost:8080` and Swagger UI at `http://localhost:8080/swagger/index.html`.
 
-| Campo | Descrição |
-|--------|------------|
-| `currentStock` | Estoque atual disponível |
-| `minimumStock` | Estoque mínimo desejado |
-| `averageDailySales` | Média de vendas por dia |
-| `leadTimeDays` | Tempo (em dias) que o fornecedor demora para entregar a peça |
-| `unitCost` | Custo unitário da peça |
-| `criticalityLevel` | Nível de criticidade (1 a 5) |
+To stop:
 
----
-
-## 🧠 Endpoint de Priorização
-
-Criar o endpoint:
-
-```GET /restock/priorities```
-
-Esse endpoint deve retornar as peças ordenadas por prioridade de reposição.
-
----
-
-## 📐 Regras de Negócio
-
-### 1️⃣ Calcular Consumo Esperado Durante o Lead Time
-
-```expectedConsumption = averageDailySales * leadTimeDays```
-
----
-
-### 2️⃣ Calcular Estoque Projetado
-
-```projectedStock = currentStock - expectedConsumption```
-
----
-
-### 3️⃣ Identificar Necessidade de Reposição
-
-Uma peça precisa de reposição quando:
-```projectedStock < minimumStock```
-
-
----
-
-### 4️⃣ Calcular Score de Prioridade
-
-O score de prioridade deve ser calculado da seguinte forma:
-
-```urgencyScore = (minimumStock - projectedStock) * criticalityLevel```
-
-
-Quanto maior o `urgencyScore`, maior a prioridade de reposição.
-
----
-
-## 🟰 Critérios de Desempate
-
-Em caso de empate no `urgencyScore`, aplicar:
-
-1. Maior `criticalityLevel`
-2. Maior `averageDailySales`
-3. Ordem alfabética pelo nome da peça
-
----
-
-## 📤 Exemplo de Resposta
-
-```json
-{
-  "priorities": [
-    {
-      "partId": "uuid-1",
-      "name": "Filtro de Óleo X",
-      "currentStock": 15,
-      "projectedStock": 5,
-      "minimumStock": 20,
-      "urgencyScore": 45
-    },
-    {
-      "partId": "uuid-2",
-      "name": "Pastilha de Freio Y",
-      "currentStock": 8,
-      "projectedStock": -2,
-      "minimumStock": 10,
-      "urgencyScore": 36
-    }
-  ]
-}
+```bash
+docker compose down
 ```
 
-### 📌 Regras Gerais
+To stop and remove the database volume:
 
-- Não utilizar APIs externas.
-- O sistema deve estar preparado para suportar centenas ou milhares de peças.
-- A solução deve permitir futura troca de banco de dados.
-- O cálculo de prioridade deve estar isolado da camada HTTP.
-- Tratar corretamente casos de estoque negativo.
+```bash
+docker compose down -v
+```
 
-### 🎯 O Que Será Avaliado
-- 🧠 Modelagem de Domínio
-- Clareza das entidades
-- Separação de responsabilidades
-- Organização das regras de negócio
+---
 
-### 🧪 Testes
-- Testes unitários do cálculo de prioridade
-- Testes de cenários extremos (estoque negativo, venda zero, lead time alto)
+## Running without Docker
 
-### 🏗️ Arquitetura
-- Uso adequado de camadas (ex: Controller, Service, Domain, Repository)
-- Código limpo e organizado
-- Facilidade de manutenção
+### 1. Set up PostgreSQL
 
-### 🧰 Tecnologias
+Make sure you have a PostgreSQL instance running locally.
 
-Pode ser desenvolvido utilizando:
+### 2. Configure environment variables
 
-- Node.js
-- Golang
-- Frameworks e bibliotecas são livres
+```bash
+cp .env.example .env
+```
 
-### 📄 Entrega
+Edit `.env` with your database credentials:
 
-O projeto deve conter:
+```dotenv
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=example
+POSTGRES_DB=postgres
+REPOSITORY_TYPE=POSTGRES
+HANDLER_TYPE=HTTP
+PAGINATION_DEFAULT_LIMIT=20
+PAGINATION_MAX_LIMIT=100
+```
 
-- Código-fonte organizado
-- README com instruções para rodar localmente
-- Exemplos de requisição
-- Testes automatizados
+### 3. Run the application
 
-Boa implementação 🚀
+```bash
+go run ./cmd
+```
+
+The API will be available at `http://localhost:8080`.
+
+---
+
+## API Endpoints
+
+| Method | Route                         | Description                     |
+|--------|-------------------------------|---------------------------------|
+| POST   | `/stock`                      | Create a product stock          |
+| GET    | `/stock`                      | List all product stocks         |
+| GET    | `/stock/:id`                  | Get a product stock by ID       |
+| PUT    | `/stock/:id`                  | Update a product stock          |
+| DELETE | `/stock/:id`                  | Delete a product stock          |
+| GET    | `/stock/category/:category`   | List product stocks by category |
+| GET    | `/restock/priorities`         | Get restock priorities          |
+| GET    | `/swagger/index.html`               | Swagger UI                      |
+
+---
+
+## Request Examples
+
+### Create a product stock
+
+```bash
+curl -X POST http://localhost:8080/stock \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Oil Filter X",
+    "category": "engine",
+    "current_stock": 15,
+    "minimum_stock": 20,
+    "average_daily_sales": 4,
+    "lead_time_days": 5,
+    "unit_cost": 18.50,
+    "criticality_level": 3
+  }'
+```
+
+### List all product stocks
+
+```bash
+curl http://localhost:8080/stock?page=1&limit=10
+```
+
+### Get a product stock by ID
+
+```bash
+curl http://localhost:8080/stock/{id}
+```
+
+### Update a product stock
+
+```bash
+curl -X PUT http://localhost:8080/stock/{id} \
+  -H "Content-Type: application/json" \
+  -d '{
+    "current_stock": 25,
+    "minimum_stock": 30
+  }'
+```
+
+### Delete a product stock
+
+```bash
+curl -X DELETE http://localhost:8080/stock/{id}
+```
+
+### Get restock priorities
+
+```bash
+curl http://localhost:8080/restock/priorities?page=1&limit=10
+```
+
+---
+
+## Running Tests
+
+```bash
+go test ./...
+```
+
+---
+
+## Swagger
+
+With the application running, access the interactive API documentation at:
+
+```
+http://localhost:8080/swagger/index.html
+```
+
+### Regenerating Swagger docs
+
+```bash
+go install github.com/swaggo/swag/cmd/swag@latest
+swag init -g cmd/main.go -o docs --parseInternal
+```
