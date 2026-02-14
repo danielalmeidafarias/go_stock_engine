@@ -1,25 +1,29 @@
-package go_orm
+package db
 
 import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/infraestructure/repository/gorm/db"
+	"gorm.io/gorm"
 )
 
-type ProductStockRepository struct {
-	gorm db.GoORM
+type ErrorMapper interface {
+	MapErrorToDomain(err error, context string) *domain.Error
 }
 
-func NewProductStockRepository(gorm db.GoORM) *ProductStockRepository {
-	return &ProductStockRepository{gorm: gorm}
+type ProductStockRepository struct {
+	db          gorm.DB
+	dbErrMapper ErrorMapper
+}
+
+func NewProductStockRepository(gorm gorm.DB, errMapper ErrorMapper) *ProductStockRepository {
+	return &ProductStockRepository{db: gorm, dbErrMapper: errMapper}
 }
 
 func (r *ProductStockRepository) Create(in *entities.ProductStock) (string, *domain.Error) {
 	model := MapProductStockToModel(in)
-	db := r.gorm.GetORM()
 
-	if err := db.Create(model).Error; err != nil {
-		return "", r.gorm.MapGormError(err, "failed to create product")
+	if err := r.db.Create(model).Error; err != nil {
+		return "", r.dbErrMapper.MapErrorToDomain(err, "failed to create product")
 	}
 
 	return model.ID, nil
@@ -27,11 +31,10 @@ func (r *ProductStockRepository) Create(in *entities.ProductStock) (string, *dom
 
 func (r *ProductStockRepository) Update(in *entities.ProductStock) *domain.Error {
 	model := MapProductStockToModel(in)
-	db := r.gorm.GetORM()
 
-	result := db.Save(model)
+	result := r.db.Save(model)
 	if result.Error != nil {
-		return r.gorm.MapGormError(result.Error, "failed to update product")
+		return r.dbErrMapper.MapErrorToDomain(result.Error, "failed to update product")
 	}
 
 	if result.RowsAffected == 0 {
@@ -43,9 +46,8 @@ func (r *ProductStockRepository) Update(in *entities.ProductStock) *domain.Error
 
 func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*entities.ProductStock, *domain.Error) {
 	var models []ProductStockModel
-	db := r.gorm.GetORM()
 
-	query := db.Model(&ProductStockModel{})
+	query := r.db.Model(&ProductStockModel{})
 
 	if pagination != nil {
 		offset := (pagination.Page - 1) * pagination.Limit
@@ -53,7 +55,7 @@ func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*entit
 	}
 
 	if err := query.Find(&models).Error; err != nil {
-		return nil, r.gorm.MapGormError(err, "failed to list products")
+		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to list products")
 	}
 
 	result := make([]*entities.ProductStock, len(models))
@@ -66,10 +68,9 @@ func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*entit
 
 func (r *ProductStockRepository) GetOneByID(id string) (*entities.ProductStock, *domain.Error) {
 	var model ProductStockModel
-	db := r.gorm.GetORM()
 
-	if err := db.First(&model, "id = ?", id).Error; err != nil {
-		return nil, r.gorm.MapGormError(err, "failed to get product")
+	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
+		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to get product")
 	}
 
 	return model.ToDomain(), nil
@@ -77,9 +78,8 @@ func (r *ProductStockRepository) GetOneByID(id string) (*entities.ProductStock, 
 
 func (r *ProductStockRepository) GetByCategory(category entities.ProductCategory, pagination *domain.Pagination) ([]*entities.ProductStock, *domain.Error) {
 	var models []ProductStockModel
-	db := r.gorm.GetORM()
 
-	query := db.Where("category = ?", string(category))
+	query := r.db.Where("category = ?", string(category))
 
 	if pagination != nil {
 		offset := (pagination.Page - 1) * pagination.Limit
@@ -87,7 +87,7 @@ func (r *ProductStockRepository) GetByCategory(category entities.ProductCategory
 	}
 
 	if err := query.Find(&models).Error; err != nil {
-		return nil, r.gorm.MapGormError(err, "failed to get products by category")
+		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to get products by category")
 	}
 
 	result := make([]*entities.ProductStock, len(models))
@@ -99,11 +99,10 @@ func (r *ProductStockRepository) GetByCategory(category entities.ProductCategory
 }
 
 func (r *ProductStockRepository) DeleteProductStock(id string) *domain.Error {
-	db := r.gorm.GetORM()
 
-	result := db.Delete(&ProductStockModel{}, "id = ?", id)
+	result := r.db.Delete(&ProductStockModel{}, "id = ?", id)
 	if result.Error != nil {
-		return r.gorm.MapGormError(result.Error, "failed to delete product")
+		return r.dbErrMapper.MapErrorToDomain(result.Error, "failed to delete product")
 	}
 
 	if result.RowsAffected == 0 {

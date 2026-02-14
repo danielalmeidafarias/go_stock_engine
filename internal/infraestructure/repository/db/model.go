@@ -1,4 +1,4 @@
-package go_orm
+package db
 
 import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/entities"

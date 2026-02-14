@@ -5,22 +5,14 @@ import (
 	"log"
 	"os"
 
-	orm "github.com/danielalmeidafarias/go_stock_engine/internal/infraestructure/repository/gorm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
+	"github.com/danielalmeidafarias/go_stock_engine/internal/infraestructure/repository/db"
 	"github.com/joho/godotenv"
 )
 
-type PostgresConnection struct {
-	db *gorm.DB
-}
-
-func (pgConn *PostgresConnection) GetORM() *gorm.DB {
-	return pgConn.db
-}
-
-func NewPostgresConnection() *PostgresConnection {
+func NewPostgresConnection() *gorm.DB {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Erro ao carregar o .env")
@@ -37,16 +29,14 @@ func NewPostgresConnection() *PostgresConnection {
 		host, port, user, password, dbName,
 	)
 
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	conn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	if err := db.AutoMigrate(&orm.ProductStockModel{}); err != nil {
+	if err := conn.AutoMigrate(&db.ProductStockModel{}); err != nil {
 		log.Fatalf("failed to run migrations: %v", err)
 	}
 
-	return &PostgresConnection{
-		db: db,
-	}
+	return conn
 }
