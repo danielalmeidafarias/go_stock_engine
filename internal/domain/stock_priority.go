@@ -48,9 +48,9 @@ type PriorityPolicy struct {
 //   - ZeroSalesFactor reduces urgency when the product has no average daily sales.
 //
 // The method returns a ProductStockPriority
-func (p ProductStock) CalculateUrgencyScore(policy PriorityPolicy) ProductStockPriority {
+func (p ProductStock) CalculateStockPriority(policy PriorityPolicy) ProductStockPriority {
 	avgSales := max(p.AverageDailySales, 0)
-	leadTime := max(p.LeadTimeDays, 0)
+	leadTime := max(p.LeadTimeDays, 1)
 	minStock := max(p.MinimumStock, 0)
 
 	criticality := 1
@@ -61,6 +61,7 @@ func (p ProductStock) CalculateUrgencyScore(policy PriorityPolicy) ProductStockP
 	expectedConsumption := avgSales * leadTime
 	projectedStock := p.CurrentStock - expectedConsumption
 	restockNeeded := projectedStock < minStock
+
 	urgencyScore := float64((minStock - projectedStock) * criticality)
 
 	if p.CurrentStock < 0 && policy.NegativeStockFactor > 1 {
@@ -71,8 +72,12 @@ func (p ProductStock) CalculateUrgencyScore(policy PriorityPolicy) ProductStockP
 		urgencyScore += (policy.LeadTimeFactor * float64(leadTime))
 	}
 
-	if avgSales == 0 && policy.ZeroSalesFactor < 1 {
-		urgencyScore = urgencyScore * policy.ZeroSalesFactor
+	if avgSales == 0 && (policy.ZeroSalesFactor < 1 && policy.ZeroSalesFactor > 0) {
+		if urgencyScore > 0 {
+			urgencyScore *= policy.ZeroSalesFactor
+		} else if urgencyScore < 0 {
+			urgencyScore /= policy.ZeroSalesFactor
+		}
 	}
 
 	return ProductStockPriority{
