@@ -37,5 +37,22 @@ func NewPostgresConnection() *gorm.DB {
 		log.Fatalf("failed to run migrations: %v", err)
 	}
 
+	if seedFile := os.Getenv("SEED_FILE"); seedFile != "" {
+		var count int64
+		conn.Model(&db.ProductStockModel{}).Count(&count)
+		if count == 0 {
+			sqlBytes, err := os.ReadFile(seedFile)
+			if err != nil {
+				log.Printf("seed file not found: %v", err)
+			} else {
+				if err := conn.Exec(string(sqlBytes)).Error; err != nil {
+					log.Printf("seed error: %v", err)
+				} else {
+					log.Println("seed data loaded successfully")
+				}
+			}
+		}
+	}
+
 	return conn
 }
