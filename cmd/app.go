@@ -6,8 +6,8 @@ import (
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/infraestructure/repository/db"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/infraestructure/repository/db/postgres"
+	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/db"
+	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/db/postgres"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/presentation/http"
 )
 

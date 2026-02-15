@@ -8,7 +8,7 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	"github.com/danielalmeidafarias/go_stock_engine/internal/infraestructure/repository/db"
+	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/db"
 	"github.com/joho/godotenv"
 )
 
