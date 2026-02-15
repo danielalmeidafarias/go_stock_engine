@@ -21,8 +21,7 @@ func ProductStockRepositoryFactory(repoType RepositoryType) repository.IProductS
 	switch repoType {
 	case Postgres:
 		conn := postgres.NewPostgresConnection()
-		errMapper := postgres.NewPostgresErrMapper()
-		return db.NewProductStockRepository(conn, errMapper)
+		return db.NewProductStockRepository(conn)
 	default:
 		panic("invalid database type")
 	}

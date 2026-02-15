@@ -5,24 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
-type ErrorMapper interface {
-	MapErrorToDomain(err error, context string) *domain.Error
-}
-
 type ProductStockRepository struct {
-	db          *gorm.DB
-	dbErrMapper ErrorMapper
+	db *gorm.DB
 }
 
-func NewProductStockRepository(gorm *gorm.DB, errMapper ErrorMapper) *ProductStockRepository {
-	return &ProductStockRepository{db: gorm, dbErrMapper: errMapper}
+func NewProductStockRepository(gorm *gorm.DB) *ProductStockRepository {
+	return &ProductStockRepository{db: gorm}
 }
 
 func (r *ProductStockRepository) Create(in *domain.ProductStock) (string, *domain.Error) {
 	model := MapProductStockToModel(in)
 
 	if err := r.db.Create(model).Error; err != nil {
-		return "", r.dbErrMapper.MapErrorToDomain(err, "failed to create product")
+		return "", r.MapErrorToDomain(err, "failed to create product")
 	}
 
 	return model.ID, nil
@@ -33,7 +28,7 @@ func (r *ProductStockRepository) Update(in *domain.ProductStock) *domain.Error {
 
 	result := r.db.Save(model)
 	if result.Error != nil {
-		return r.dbErrMapper.MapErrorToDomain(result.Error, "failed to update product")
+		return r.MapErrorToDomain(result.Error, "failed to update product")
 	}
 
 	if result.RowsAffected == 0 {
@@ -54,7 +49,7 @@ func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*domai
 	}
 
 	if err := query.Find(&models).Error; err != nil {
-		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to list products")
+		return nil, r.MapErrorToDomain(err, "failed to list products")
 	}
 
 	result := make([]*domain.ProductStock, len(models))
@@ -69,7 +64,7 @@ func (r *ProductStockRepository) GetOneByID(id string) (*domain.ProductStock, *d
 	var model ProductStockModel
 
 	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
-		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to get product")
+		return nil, r.MapErrorToDomain(err, "failed to get product")
 	}
 
 	return model.ToDomain(), nil
@@ -86,7 +81,7 @@ func (r *ProductStockRepository) GetByCategory(category domain.ProductCategory, 
 	}
 
 	if err := query.Find(&models).Error; err != nil {
-		return nil, r.dbErrMapper.MapErrorToDomain(err, "failed to get products by category")
+		return nil, r.MapErrorToDomain(err, "failed to get products by category")
 	}
 
 	result := make([]*domain.ProductStock, len(models))
@@ -101,7 +96,7 @@ func (r *ProductStockRepository) DeleteProductStock(id string) *domain.Error {
 
 	result := r.db.Delete(&ProductStockModel{}, "id = ?", id)
 	if result.Error != nil {
-		return r.dbErrMapper.MapErrorToDomain(result.Error, "failed to delete product")
+		return r.MapErrorToDomain(result.Error, "failed to delete product")
 	}
 
 	if result.RowsAffected == 0 {
