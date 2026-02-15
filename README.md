@@ -144,10 +144,16 @@ curl "http://localhost:8080/restock/priorities?page=1&limit=10"
 
 ## Running Tests
 
-### Unit tests (use cases + domain)
+### Domain Restock Priority tests
 
 ```bash
-go test ./internal/... -v
+go test -v ./internal/domain
+```
+
+### Use cases unit tests
+
+```bash
+go test -v ./internal/application/tests
 ```
 
 ### E2E tests
@@ -155,7 +161,7 @@ go test ./internal/... -v
 Requires the application running (`docker compose up -d` or `go run ./cmd`):
 
 ```bash
-go test ./tests/e2e/ -v -count=1 -timeout 600s
+go test ./tests/e2e/ -v -count=1
 ```
 
 ---
