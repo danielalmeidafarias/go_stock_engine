@@ -57,7 +57,7 @@ func NewProductStock(
 		return nil, NewError(errValidation, ErrBadRequest)
 	}
 
-	return &ProductStock{
+	p := &ProductStock{
 		Name:              name,
 		Category:          category,
 		CurrentStock:      currentStock,
@@ -66,5 +66,11 @@ func NewProductStock(
 		LeadTimeDays:      leadTimeDays,
 		UnitCost:          unitCost,
 		CriticalityLevel:  criticalityLevel,
-	}, nil
+	}
+
+	if id != nil {
+		p.ID = id
+	}
+
+	return p, nil
 }
