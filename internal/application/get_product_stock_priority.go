@@ -41,7 +41,7 @@ func (uc *GetProductPriorityUseCase) Execute(pagination domain.Pagination) ([]do
 	for _, p := range products {
 		wg.Go(func() {
 
-			stockPriority := p.CalculateUrgencyScore(uc.policy)
+			stockPriority := p.CalculateStockPriority(uc.policy)
 
 			if stockPriority.RestockNeeded {
 				mu.Lock()
