@@ -55,6 +55,9 @@ REPOSITORY_TYPE=POSTGRES
 HANDLER_TYPE=HTTP
 PAGINATION_DEFAULT_LIMIT=20
 PAGINATION_MAX_LIMIT=100
+PRIORITY_NEGATIVE_STOCK_FACTOR=1.5
+PRIORITY_LEAD_TIME_FACTOR=1.2
+PRIORITY_ZERO_SALES_FACTOR=0.5
 ```
 
 ### 3. Run the application
@@ -104,7 +107,7 @@ curl -X POST http://localhost:8080/stock \
 ### List all product stocks
 
 ```bash
-curl http://localhost:8080/stock?page=1&limit=10
+curl "http://localhost:8080/stock?page=1&limit=10"
 ```
 
 ### Get a product stock by ID
@@ -133,15 +136,25 @@ curl -X DELETE http://localhost:8080/stock/{id}
 ### Get restock priorities
 
 ```bash
-curl http://localhost:8080/restock/priorities?page=1&limit=10
+curl "http://localhost:8080/restock/priorities?page=1&limit=10"
 ```
 
 ---
 
 ## Running Tests
 
+### Unit tests (use cases + domain)
+
 ```bash
-go test ./...
+go test ./internal/... -v
+```
+
+### E2E tests
+
+Requires the application running (`docker compose up -d` or `go run ./cmd`):
+
+```bash
+go test ./tests/e2e/ -v -count=1 -timeout 600s
 ```
 
 ---
