@@ -95,14 +95,14 @@ type restockPriorityResponse struct {
 }
 
 type createProductStockRequest struct {
-	Name              string  `json:"name" binding:"required"`
-	Category          string  `json:"category" binding:"required"`
+	Name              string  `json:"name"`
+	Category          string  `json:"category"`
 	CurrentStock      int     `json:"current_stock"`
 	MinimumStock      int     `json:"minimum_stock"`
 	AverageDailySales int     `json:"average_daily_sales"`
 	LeadTimeDays      int     `json:"lead_time_days"`
-	UnitCost          float64 `json:"unit_cost" binding:"required"`
-	CriticalityLevel  int     `json:"criticality_level" binding:"required"`
+	UnitCost          float64 `json:"unit_cost"`
+	CriticalityLevel  int     `json:"criticality_level"`
 }
 
 // Create godoc
