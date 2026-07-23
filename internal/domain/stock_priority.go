@@ -51,7 +51,7 @@ type PriorityPolicy struct {
 // The method returns a ProductStockPriority
 func (p ProductStock) CalculateStockPriority(policy PriorityPolicy) ProductStockPriority {
 	avgSales := max(p.AverageDailySales, 0)
-	leadTime := max(p.LeadTimeDays, 1)
+	leadTime := p.LeadTimeDays
 	minStock := max(p.MinimumStock, 0)
 
 	criticality := 1
@@ -82,7 +82,7 @@ func (p ProductStock) ApplyPolicies(urgencyScore float64, policy PriorityPolicy)
 	}
 
 	avgSales := max(p.AverageDailySales, 0)
-	leadTime := max(p.LeadTimeDays, 1)
+	leadTime := p.LeadTimeDays
 
 	if p.CurrentStock < 0 && policy.NegativeStockFactor > 1 {
 		urgencyScore += (policy.NegativeStockFactor * (float64(p.CurrentStock) * -1))

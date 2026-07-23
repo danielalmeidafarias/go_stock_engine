@@ -322,6 +322,38 @@ func TestCalculateStockPriority_HighLeadTime(t *testing.T) {
 	}
 }
 
+func TestCalculateStockPriority_ZeroLeadTime(t *testing.T) {
+	p := ProductStock{
+		Name:              "Immediate Part",
+		Category:          "engine",
+		CurrentStock:      5,
+		MinimumStock:      10,
+		AverageDailySales: 5,
+		LeadTimeDays:      0,
+		UnitCost:          200.0,
+		CriticalityLevel:  High,
+	}
+	policy := PriorityPolicy{
+		UsePolicy:      true,
+		LeadTimeFactor: 1.5,
+	}
+
+	result := p.CalculateStockPriority(policy)
+
+	if result.ExpectedConsumption != 0 {
+		t.Errorf("ExpectedConsumption: got %d, want 0", result.ExpectedConsumption)
+	}
+	if result.ProjectedStock != 5 {
+		t.Errorf("ProjectedStock: got %d, want 5", result.ProjectedStock)
+	}
+	if result.UrgencyScore != 15.0 {
+		t.Errorf("UrgencyScore: got %f, want 15.0", result.UrgencyScore)
+	}
+	if !result.RestockNeeded {
+		t.Error("RestockNeeded: got false, want true")
+	}
+}
+
 func TestCalculateStockPriority_InvalidCriticalityDefaultsToOne(t *testing.T) {
 	p := ProductStock{
 		Name:              "Bad Criticality",
