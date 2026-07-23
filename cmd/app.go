@@ -6,25 +6,16 @@ import (
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/db"
-	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/db/postgres"
+	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/factory"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/presentation/http"
 )
 
-type RepositoryType string
+type RepositoryType = factory.Type
 
-const (
-	Postgres RepositoryType = "POSTGRES"
-)
+const Postgres = factory.Postgres
 
 func ProductStockRepositoryFactory(repoType RepositoryType) repository.IProductStockRepository {
-	switch repoType {
-	case Postgres:
-		conn := postgres.NewPostgresConnection()
-		return db.NewProductStockRepository(conn)
-	default:
-		panic("invalid database type")
-	}
+	return factory.NewProductStockRepository(repoType)
 }
 
 type HandlerType string
