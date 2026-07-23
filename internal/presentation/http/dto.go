@@ -1,6 +1,10 @@
 package http
 
-import "github.com/danielalmeidafarias/go_stock_engine/internal/domain"
+import (
+	"math"
+
+	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
+)
 
 type errorResponseDTO struct {
 	Error string `json:"error" example:"error message"`
@@ -49,12 +53,12 @@ type restockPrioritiesResponseDTO struct {
 
 // restockPriorityResponseDTO represents a product restock priority.
 type restockPriorityResponseDTO struct {
-	PartID         string  `json:"partId" example:"550e8400-e29b-41d4-a716-446655440000"`
-	Name           string  `json:"name" example:"Engine Oil Filter"`
-	CurrentStock   int     `json:"currentStock" example:"15"`
-	ProjectedStock int     `json:"projectedStock" example:"-20"`
-	MinimumStock   int     `json:"minimumStock" example:"20"`
-	UrgencyScore   float64 `json:"urgencyScore" example:"45"`
+	PartID         string `json:"partId" example:"550e8400-e29b-41d4-a716-446655440000"`
+	Name           string `json:"name" example:"Engine Oil Filter"`
+	CurrentStock   int    `json:"currentStock" example:"15"`
+	ProjectedStock int    `json:"projectedStock" example:"-20"`
+	MinimumStock   int    `json:"minimumStock" example:"20"`
+	UrgencyScore   int    `json:"urgencyScore" example:"45"`
 }
 
 func toProductStockResponseDTO(product *domain.ProductStock) productStockResponseDTO {
@@ -83,17 +87,21 @@ func toProductStockResponseDTOs(products []*domain.ProductStock) []productStockR
 func toRestockPrioritiesResponseDTO(priorities []domain.ProductStockPriority) restockPrioritiesResponseDTO {
 	responses := make([]restockPriorityResponseDTO, len(priorities))
 	for i, priority := range priorities {
-		responses[i] = restockPriorityResponseDTO{
-			PartID:         productID(priority.ProductStock),
-			Name:           priority.ProductStock.Name,
-			CurrentStock:   priority.ProductStock.CurrentStock,
-			ProjectedStock: priority.ProjectedStock,
-			MinimumStock:   priority.ProductStock.MinimumStock,
-			UrgencyScore:   priority.UrgencyScore,
-		}
+		responses[i] = toRestockPriorityResponseDTO(priority)
 	}
 
 	return restockPrioritiesResponseDTO{Priorities: responses}
+}
+
+func toRestockPriorityResponseDTO(priority domain.ProductStockPriority) restockPriorityResponseDTO {
+	return restockPriorityResponseDTO{
+		PartID:         productID(priority.ProductStock),
+		Name:           priority.ProductStock.Name,
+		CurrentStock:   priority.ProductStock.CurrentStock,
+		ProjectedStock: priority.ProjectedStock,
+		MinimumStock:   priority.ProductStock.MinimumStock,
+		UrgencyScore:   int(math.Floor(priority.UrgencyScore)),
+	}
 }
 
 func productID(product *domain.ProductStock) string {

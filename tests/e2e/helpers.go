@@ -40,12 +40,12 @@ type restockPrioritiesResponse struct {
 }
 
 type restockPriorityResponse struct {
-	PartID         string  `json:"partId"`
-	Name           string  `json:"name"`
-	CurrentStock   int     `json:"currentStock"`
-	ProjectedStock int     `json:"projectedStock"`
-	MinimumStock   int     `json:"minimumStock"`
-	UrgencyScore   float64 `json:"urgencyScore"`
+	PartID         string `json:"partId"`
+	Name           string `json:"name"`
+	CurrentStock   int    `json:"currentStock"`
+	ProjectedStock int    `json:"projectedStock"`
+	MinimumStock   int    `json:"minimumStock"`
+	UrgencyScore   int    `json:"urgencyScore"`
 }
 
 type updateRequest struct {

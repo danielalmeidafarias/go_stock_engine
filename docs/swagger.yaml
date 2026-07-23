@@ -86,7 +86,7 @@ definitions:
         type: integer
       urgencyScore:
         example: 45
-        type: number
+        type: integer
     type: object
   http.updateProductStockRequestDTO:
     properties:

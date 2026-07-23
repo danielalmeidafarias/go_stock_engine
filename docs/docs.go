@@ -475,7 +475,7 @@ const docTemplate = `{
                     "example": -20
                 },
                 "urgencyScore": {
-                    "type": "number",
+                    "type": "integer",
                     "example": 45
                 }
             }
