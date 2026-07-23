@@ -9,6 +9,6 @@ type IProductStockRepository interface {
 	Update(in *domain.ProductStock) *domain.Error
 	GetAll(pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error)
 	GetOneByID(id string) (*domain.ProductStock, *domain.Error)
-	GetByCategory(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error)
+	GetByCategory(category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error)
 	DeleteProductStock(id string) *domain.Error
 }

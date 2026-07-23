@@ -30,7 +30,7 @@ func (uc *CreateProductStockUseCase) Execute(dto CreateProductStockDTO) (string,
 	productStock, err := domain.NewProductStock(
 		nil,
 		dto.Name,
-		domain.ProductCategory(dto.Category),
+		dto.Category,
 		dto.CurrentStock,
 		dto.MinimumStock,
 		dto.AverageDailySales,

@@ -23,15 +23,13 @@ type GetByCategoryDTO struct {
 }
 
 func (uc *GetByCategoryProductStockUseCase) Execute(dto GetByCategoryDTO) ([]*domain.ProductStock, *domain.Error) {
-	category := domain.ProductCategory(dto.Category)
-
-	if !domain.IsValidProductCategory(category) {
-		return nil, domain.NewError("invalid product category", domain.ErrBadRequest)
+	if dto.Category == "" {
+		return nil, domain.NewError("category is required", domain.ErrBadRequest)
 	}
 
 	domain.ApplyPaginationRules(&dto.Pagination, uc.paginationConfig)
 
-	products, err := uc.repo.GetByCategory(category, &dto.Pagination)
+	products, err := uc.repo.GetByCategory(dto.Category, &dto.Pagination)
 	if err != nil {
 		return nil, err
 	}

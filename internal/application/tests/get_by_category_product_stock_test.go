@@ -10,9 +10,9 @@ import (
 
 func TestGetByCategoryProductStock_Success(t *testing.T) {
 	repo := &mocks.MockProductStockRepository{
-		GetByCategoryFn: func(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+		GetByCategoryFn: func(category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 			return []*domain.ProductStock{
-				{Name: "Engine Part", Category: domain.Engine},
+				{Name: "Engine Part", Category: "engine"},
 			}, nil
 		},
 	}
@@ -32,18 +32,18 @@ func TestGetByCategoryProductStock_Success(t *testing.T) {
 	}
 }
 
-func TestGetByCategoryProductStock_InvalidCategory(t *testing.T) {
+func TestGetByCategoryProductStock_EmptyCategory(t *testing.T) {
 	repo := &mocks.MockProductStockRepository{}
 	config := domain.PaginationConfig{DefaultLimit: 20, MaxLimit: 100}
 	uc := usecases.NewGetByCategoryProductStockUseCase(repo, config)
 
 	_, err := uc.Execute(usecases.GetByCategoryDTO{
-		Category:   "invalid",
+		Category:   "",
 		Pagination: domain.Pagination{Page: 1, Limit: 10},
 	})
 
 	if err == nil {
-		t.Fatal("expected error for invalid category")
+		t.Fatal("expected error for empty category")
 	}
 	if err.ErrCode != domain.ErrBadRequest {
 		t.Errorf("ErrCode: got %d, want ErrBadRequest", err.ErrCode)
@@ -52,7 +52,7 @@ func TestGetByCategoryProductStock_InvalidCategory(t *testing.T) {
 
 func TestGetByCategoryProductStock_RepoError(t *testing.T) {
 	repo := &mocks.MockProductStockRepository{
-		GetByCategoryFn: func(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+		GetByCategoryFn: func(category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 			return nil, domain.NewError("db error", domain.ErrInternal)
 		},
 	}

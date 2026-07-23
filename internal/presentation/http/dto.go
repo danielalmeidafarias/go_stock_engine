@@ -65,7 +65,7 @@ func toProductStockResponseDTO(product *domain.ProductStock) productStockRespons
 	return productStockResponseDTO{
 		ID:                productID(product),
 		Name:              product.Name,
-		Category:          string(product.Category),
+		Category:          product.Category,
 		CurrentStock:      product.CurrentStock,
 		MinimumStock:      product.MinimumStock,
 		AverageDailySales: product.AverageDailySales,

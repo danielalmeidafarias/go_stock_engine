@@ -7,7 +7,7 @@ import (
 func TestCalculateStockPriority_NormalScenario(t *testing.T) {
 	p := ProductStock{
 		Name:              "Oil Filter",
-		Category:          Oil,
+		Category:          "oil",
 		CurrentStock:      100,
 		MinimumStock:      50,
 		AverageDailySales: 10,
@@ -102,7 +102,7 @@ func TestCalculateStockPriority_PolicyDisabledIgnoresZeroSalesFactor(t *testing.
 func TestCalculateStockPriority_RestockNeeded(t *testing.T) {
 	p := ProductStock{
 		Name:              "Engine Part A",
-		Category:          Engine,
+		Category:          "engine",
 		CurrentStock:      30,
 		MinimumStock:      50,
 		AverageDailySales: 10,
@@ -141,7 +141,7 @@ func TestCalculateStockPriority_RestockNeeded(t *testing.T) {
 func TestCalculateStockPriority_NegativeStock(t *testing.T) {
 	p := ProductStock{
 		Name:              "Engine Part B",
-		Category:          Engine,
+		Category:          "engine",
 		CurrentStock:      -10,
 		MinimumStock:      50,
 		AverageDailySales: 5,
@@ -175,7 +175,7 @@ func TestCalculateStockPriority_NegativeStock(t *testing.T) {
 func TestCalculateStockPriority_NegativeStockFactorNotApplied(t *testing.T) {
 	p := ProductStock{
 		Name:              "Part X",
-		Category:          Engine,
+		Category:          "engine",
 		CurrentStock:      -5,
 		MinimumStock:      20,
 		AverageDailySales: 2,
@@ -203,7 +203,7 @@ func TestCalculateStockPriority_NegativeStockFactorNotApplied(t *testing.T) {
 func TestCalculateStockPriority_ZeroSalesPositiveUrgency(t *testing.T) {
 	p := ProductStock{
 		Name:              "Slow Mover",
-		Category:          Oil,
+		Category:          "oil",
 		CurrentStock:      10,
 		MinimumStock:      50,
 		AverageDailySales: 0,
@@ -235,7 +235,7 @@ func TestCalculateStockPriority_ZeroSalesPositiveUrgency(t *testing.T) {
 func TestCalculateStockPriority_ZeroSalesNegativeUrgency(t *testing.T) {
 	p := ProductStock{
 		Name:              "Overstocked No Sales",
-		Category:          Oil,
+		Category:          "oil",
 		CurrentStock:      200,
 		MinimumStock:      10,
 		AverageDailySales: 0,
@@ -266,7 +266,7 @@ func TestCalculateStockPriority_ZeroSalesNegativeUrgency(t *testing.T) {
 func TestCalculateStockPriority_ZeroSalesFactorNotApplied(t *testing.T) {
 	p := ProductStock{
 		Name:              "No Sales Factor High",
-		Category:          Oil,
+		Category:          "oil",
 		CurrentStock:      10,
 		MinimumStock:      50,
 		AverageDailySales: 0,
@@ -292,7 +292,7 @@ func TestCalculateStockPriority_ZeroSalesFactorNotApplied(t *testing.T) {
 func TestCalculateStockPriority_HighLeadTime(t *testing.T) {
 	p := ProductStock{
 		Name:              "Long Lead Part",
-		Category:          Engine,
+		Category:          "engine",
 		CurrentStock:      100,
 		MinimumStock:      80,
 		AverageDailySales: 5,
@@ -325,7 +325,7 @@ func TestCalculateStockPriority_HighLeadTime(t *testing.T) {
 func TestCalculateStockPriority_InvalidCriticalityDefaultsToOne(t *testing.T) {
 	p := ProductStock{
 		Name:              "Bad Criticality",
-		Category:          Oil,
+		Category:          "oil",
 		CurrentStock:      10,
 		MinimumStock:      50,
 		AverageDailySales: 5,

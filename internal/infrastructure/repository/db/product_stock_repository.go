@@ -70,10 +70,10 @@ func (r *ProductStockRepository) GetOneByID(id string) (*domain.ProductStock, *d
 	return model.ToDomain(), nil
 }
 
-func (r *ProductStockRepository) GetByCategory(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+func (r *ProductStockRepository) GetByCategory(category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	var models []ProductStockModel
 
-	query := r.db.Where("category = ?", string(category))
+	query := r.db.Where("category = ?", category)
 
 	if pagination != nil {
 		offset := (pagination.Page - 1) * pagination.Limit

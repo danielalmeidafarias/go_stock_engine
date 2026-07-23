@@ -13,7 +13,7 @@ func TestUpdateProductStock_Success(t *testing.T) {
 	existingProduct := &domain.ProductStock{
 		ID:                &id,
 		Name:              "Engine Oil",
-		Category:          domain.Engine,
+		Category:          "engine",
 		CurrentStock:      100,
 		MinimumStock:      20,
 		AverageDailySales: 5,
@@ -83,7 +83,7 @@ func TestUpdateProductStock_InvalidFieldAfterUpdate(t *testing.T) {
 	existingProduct := &domain.ProductStock{
 		ID:                &id,
 		Name:              "Engine Oil",
-		Category:          domain.Engine,
+		Category:          "engine",
 		CurrentStock:      100,
 		MinimumStock:      20,
 		AverageDailySales: 5,
@@ -118,7 +118,7 @@ func TestUpdateProductStock_AllFields(t *testing.T) {
 	existingProduct := &domain.ProductStock{
 		ID:                &id,
 		Name:              "Engine Oil",
-		Category:          domain.Engine,
+		Category:          "engine",
 		CurrentStock:      100,
 		MinimumStock:      20,
 		AverageDailySales: 5,

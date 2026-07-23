@@ -10,7 +10,7 @@ type MockProductStockRepository struct {
 	UpdateFn             func(in *domain.ProductStock) *domain.Error
 	GetAllFn             func(pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error)
 	GetOneByIDFn         func(id string) (*domain.ProductStock, *domain.Error)
-	GetByCategoryFn      func(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error)
+	GetByCategoryFn      func(category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error)
 	DeleteProductStockFn func(id string) *domain.Error
 }
 
@@ -30,7 +30,7 @@ func (m *MockProductStockRepository) GetOneByID(id string) (*domain.ProductStock
 	return m.GetOneByIDFn(id)
 }
 
-func (m *MockProductStockRepository) GetByCategory(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+func (m *MockProductStockRepository) GetByCategory(category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	return m.GetByCategoryFn(category, pagination)
 }
 

@@ -3,7 +3,7 @@ package domain
 type ProductStock struct {
 	ID                *string
 	Name              string
-	Category          ProductCategory
+	Category          string
 	CurrentStock      int
 	MinimumStock      int
 	AverageDailySales int
@@ -15,7 +15,7 @@ type ProductStock struct {
 func NewProductStock(
 	id *string,
 	name string,
-	category ProductCategory,
+	category string,
 	currentStock, minimumStock, averageDailySales, leadTimeDays int,
 	unitCost float64,
 	criticalityLevel CriticalityLevel,
@@ -42,8 +42,8 @@ func NewProductStock(
 			return "unit cost must be greater than zero"
 		}
 
-		if !IsValidProductCategory(category) {
-			return "invalid product category"
+		if category == "" {
+			return "category is required"
 		}
 
 		if !IsValidCriticalityLevel(criticalityLevel) {

@@ -54,19 +54,26 @@ func TestCreateProductStock_ValidationError(t *testing.T) {
 	}
 }
 
-func TestCreateProductStock_InvalidCategory(t *testing.T) {
-	repo := &mocks.MockProductStockRepository{}
+func TestCreateProductStock_AcceptsCustomCategory(t *testing.T) {
+	repo := &mocks.MockProductStockRepository{
+		CreateFn: func(in *domain.ProductStock) (string, *domain.Error) {
+			if in.Category != "suspension" {
+				t.Errorf("Category: got %q, want suspension", in.Category)
+			}
+			return "uuid-123", nil
+		},
+	}
 	uc := usecases.NewCreateProductStockUseCase(repo)
 
 	_, err := uc.Execute(usecases.CreateProductStockDTO{
 		Name:             "Test",
-		Category:         "invalid_category",
+		Category:         "suspension",
 		UnitCost:         25.0,
 		CriticalityLevel: 3,
 	})
 
-	if err == nil {
-		t.Fatal("expected error for invalid category")
+	if err != nil {
+		t.Fatalf("unexpected error: %s", err.Message)
 	}
 }
 
