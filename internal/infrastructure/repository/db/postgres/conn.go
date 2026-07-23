@@ -12,6 +12,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+const defaultSeedFile = "/usr/local/bin/seed.sql"
+
 func NewPostgresConnection() *gorm.DB {
 	if err := godotenv.Load(); err != nil {
 		log.Println(".env not found, using system environment variables")
@@ -37,7 +39,7 @@ func NewPostgresConnection() *gorm.DB {
 		log.Fatalf("failed to run migrations: %v", err)
 	}
 
-	if seedFile := os.Getenv("SEED_FILE"); seedFile != "" {
+	if seedFile := seedFilePath(); seedFile != "" {
 		var count int64
 		conn.Model(&db.ProductStockModel{}).Count(&count)
 		if count == 0 {
@@ -55,4 +57,16 @@ func NewPostgresConnection() *gorm.DB {
 	}
 
 	return conn
+}
+
+func seedFilePath() string {
+	if os.Getenv("USE_SEED") != "true" {
+		return ""
+	}
+
+	if seedFile := os.Getenv("SEED_FILE"); seedFile != "" {
+		return seedFile
+	}
+
+	return defaultSeedFile
 }

@@ -50,8 +50,12 @@ services:
       PRIORITY_NEGATIVE_STOCK_FACTOR: "1.5"
       PRIORITY_LEAD_TIME_FACTOR: "1.2"
       PRIORITY_ZERO_SALES_FACTOR: "0.5"
+      USE_SEED: "true"
+      SEED_FILE: "/usr/local/bin/seed.sql"
     ports:
       - "8080:8080"
+    volumes:
+      - ./internal/infrastructure/repository/db/seed.sql:/usr/local/bin/seed.sql:ro
 
 volumes:
   db_data:
