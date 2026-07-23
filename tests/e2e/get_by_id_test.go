@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"encoding/json"
 	"math/rand"
 	"net/http"
 	"sync"
@@ -36,6 +37,16 @@ func runGetByID(t *testing.T) {
 				errors++
 				mu.Unlock()
 				t.Errorf("GET /stock/%s: expected 200, got %d: %s", id, resp.StatusCode, string(body))
+				return
+			}
+
+			var product productStockResponse
+			if err := json.Unmarshal(body, &product); err != nil {
+				t.Errorf("GET /stock/%s: decode response: %v", id, err)
+				return
+			}
+			if product.ID != id || product.Name == "" {
+				t.Errorf("GET /stock/%s: invalid product response: %#v", id, product)
 			}
 		}()
 	}

@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"testing"
@@ -22,6 +23,12 @@ func runGetAllProductStock(t *testing.T) {
 		elapsed := time.Since(start)
 		if resp.StatusCode != http.StatusOK {
 			t.Errorf("GET %s: expected 200, got %d: %s", url, resp.StatusCode, string(body))
+			continue
+		}
+
+		var products []productStockResponse
+		if err := json.Unmarshal(body, &products); err != nil {
+			t.Errorf("GET %s: decode response: %v", url, err)
 			continue
 		}
 		t.Logf("GET all page=%d limit=%d: %v", p.page, p.limit, elapsed)

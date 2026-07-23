@@ -23,6 +23,31 @@ type createResponse struct {
 	ID string `json:"id"`
 }
 
+type productStockResponse struct {
+	ID                string  `json:"id"`
+	Name              string  `json:"name"`
+	Category          string  `json:"category"`
+	CurrentStock      int     `json:"currentStock"`
+	MinimumStock      int     `json:"minimumStock"`
+	AverageDailySales int     `json:"averageDailySales"`
+	LeadTimeDays      int     `json:"leadTimeDays"`
+	UnitCost          float64 `json:"unitCost"`
+	CriticalityLevel  int     `json:"criticalityLevel"`
+}
+
+type restockPrioritiesResponse struct {
+	Priorities []restockPriorityResponse `json:"priorities"`
+}
+
+type restockPriorityResponse struct {
+	PartID         string  `json:"partId"`
+	Name           string  `json:"name"`
+	CurrentStock   int     `json:"currentStock"`
+	ProjectedStock int     `json:"projectedStock"`
+	MinimumStock   int     `json:"minimumStock"`
+	UrgencyScore   float64 `json:"urgencyScore"`
+}
+
 type updateRequest struct {
 	CurrentStock      *int     `json:"current_stock,omitempty"`
 	MinimumStock      *int     `json:"minimum_stock,omitempty"`

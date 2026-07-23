@@ -35,9 +35,17 @@ func runRestockPriorities(t *testing.T) {
 			continue
 		}
 
-		var results []json.RawMessage
-		json.Unmarshal(body, &results)
-		t.Logf("PRIORITIES page=%d limit=%d: %v (returned %d items)", p.page, p.limit, elapsed, len(results))
+		var result restockPrioritiesResponse
+		if err := json.Unmarshal(body, &result); err != nil {
+			t.Errorf("GET %s: decode response: %v", url, err)
+			continue
+		}
+		for _, priority := range result.Priorities {
+			if priority.PartID == "" || priority.Name == "" {
+				t.Errorf("GET %s: invalid priority response: %#v", url, priority)
+			}
+		}
+		t.Logf("PRIORITIES page=%d limit=%d: %v (returned %d items)", p.page, p.limit, elapsed, len(result.Priorities))
 	}
 
 	// Measure multiple sequential requests for consistency
