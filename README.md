@@ -140,6 +140,8 @@ curl -X DELETE http://localhost:8080/stock/{id}
 curl "http://localhost:8080/restock/priorities?page=1&limit=10"
 ```
 
+> **Design decision:** Restock priorities are calculated and ordered in memory before pagination. This keeps the priority rules and configurable policy factors in the domain layer instead of duplicating business rules in database queries.
+
 ---
 
 ## Running Tests
