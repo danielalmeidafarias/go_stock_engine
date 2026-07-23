@@ -30,6 +30,16 @@ services:
   #   depends_on:
   #     - db
 
+  migrate:
+    build: .
+    command: ["migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_DRIVER: POSTGRES
+      DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable
+
   app:
     build: .
     container_name: inventory_app
@@ -37,6 +47,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       DATABASE_DRIVER: POSTGRES
       DATABASE_URL: postgres://postgres:example@db:5432/postgres?sslmode=disable

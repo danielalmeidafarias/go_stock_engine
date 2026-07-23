@@ -13,11 +13,23 @@ services:
       timeout: 2s
       retries: 15
 
+  migrate:
+    build: .
+    command: ["migrate"]
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_DRIVER: POSTGRES
+      DATABASE_URL: postgres://postgres:example@db:5432/stock_e2e?sslmode=disable
+
   app:
     build: .
     depends_on:
       db:
         condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
     environment:
       DATABASE_DRIVER: POSTGRES
       DATABASE_URL: postgres://postgres:example@db:5432/stock_e2e?sslmode=disable

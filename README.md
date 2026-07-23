@@ -56,7 +56,23 @@ PRIORITY_LEAD_TIME_FACTOR=1.2
 PRIORITY_ZERO_SALES_FACTOR=0.5
 ```
 
-### 3. Seed the database (optional)
+### 3. Run migrations
+
+The API does not change the schema during startup. Apply pending migrations before
+running it:
+
+```bash
+go run ./cmd/migrate
+```
+
+With Docker Compose, migrations run automatically before the API starts. To run
+them manually:
+
+```bash
+docker compose run --rm migrate
+```
+
+### 4. Seed the database (optional)
 
 The API never seeds data during startup. To load the demonstration products into an empty database, run:
 
@@ -72,7 +88,7 @@ docker compose run --rm app seed
 
 The command skips execution when product stock records already exist.
 
-### 4. Run the application
+### 5. Run the application
 
 ```bash
 go run ./cmd/app
