@@ -43,7 +43,7 @@ application/domain, never the reverse.
   or parameter changes:
 
   ```bash
-  swag init -g cmd/main.go -o docs --parseInternal
+  swag init -g cmd/app/main.go -o docs --parseInternal
   ```
 
 ## Verification
@@ -69,4 +69,4 @@ go test ./...
 ```
 
 For local execution, configure the environment described in `README.md`, then
-run `go run ./cmd`; Docker uses `docker compose up --build`.
+run `go run ./cmd/app`; Docker uses `docker compose up --build`.

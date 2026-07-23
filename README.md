@@ -46,12 +46,8 @@ cp .env.example .env
 Edit `.env` with your database credentials:
 
 ```dotenv
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=example
-POSTGRES_DB=postgres
-REPOSITORY_TYPE=POSTGRES
+DATABASE_DRIVER=POSTGRES
+DATABASE_URL=postgres://postgres:example@localhost:5432/postgres?sslmode=disable
 HANDLER_TYPE=HTTP
 PAGINATION_DEFAULT_LIMIT=20
 PAGINATION_MAX_LIMIT=100
@@ -79,7 +75,7 @@ The command skips execution when product stock records already exist.
 ### 4. Run the application
 
 ```bash
-go run ./cmd
+go run ./cmd/app
 ```
 
 The API will be available at `http://localhost:8080`.
@@ -175,7 +171,7 @@ go test -v ./internal/application/tests
 
 ### HTTP benchmarks
 
-Requires the application running (`docker compose up -d` or `go run ./cmd`):
+Requires the application running (`docker compose up -d` or `go run ./cmd/app`):
 
 ```bash
 go test ./tests/benchmark -run '^$' -bench . -benchmem
@@ -203,5 +199,5 @@ http://localhost:8080/swagger/index.html
 
 ```bash
 go install github.com/swaggo/swag/cmd/swag@latest
-swag init -g cmd/main.go -o docs --parseInternal
+swag init -g cmd/app/main.go -o docs --parseInternal
 ```
