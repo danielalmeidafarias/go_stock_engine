@@ -1,9 +1,7 @@
 package postgres
 
 import (
-	"fmt"
 	"log"
-	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -11,19 +9,8 @@ import (
 	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/db"
 )
 
-func NewPostgresConnection() *gorm.DB {
-	host := os.Getenv("POSTGRES_HOST")
-	port := os.Getenv("POSTGRES_PORT")
-	user := os.Getenv("POSTGRES_USER")
-	password := os.Getenv("POSTGRES_PASSWORD")
-	dbName := os.Getenv("POSTGRES_DB")
-
-	dsn := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbName,
-	)
-
-	conn, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+func NewPostgresConnection(connectionString string) *gorm.DB {
+	conn, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}

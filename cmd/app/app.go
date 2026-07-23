@@ -4,18 +4,15 @@ import (
 	"strconv"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
+	"github.com/danielalmeidafarias/go_stock_engine/internal/config"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/infrastructure/repository/factory"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/presentation/http"
 )
 
-type RepositoryType = factory.Type
-
-const Postgres = factory.Postgres
-
-func ProductStockRepositoryFactory(repoType RepositoryType) repository.IProductStockRepository {
-	return factory.NewProductStockRepository(repoType)
+func ProductStockRepositoryFactory(database config.DatabaseConfig) repository.IProductStockRepository {
+	return factory.NewProductStockRepository(database)
 }
 
 type HandlerType string
