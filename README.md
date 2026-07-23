@@ -156,12 +156,12 @@ go test -v ./internal/domain
 go test -v ./internal/application/tests
 ```
 
-### E2E tests
+### HTTP benchmarks
 
 Requires the application running (`docker compose up -d` or `go run ./cmd`):
 
 ```bash
-go test ./tests/e2e/ -v -count=1
+go test ./tests/benchmark -run '^$' -bench . -benchmem
 ```
 
 ---
