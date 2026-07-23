@@ -58,10 +58,25 @@ PAGINATION_MAX_LIMIT=100
 PRIORITY_NEGATIVE_STOCK_FACTOR=1.5
 PRIORITY_LEAD_TIME_FACTOR=1.2
 PRIORITY_ZERO_SALES_FACTOR=0.5
-SEED_FILE=internal/infrastructure/repository/db/seed.sql
 ```
 
-### 3. Run the application
+### 3. Seed the database (optional)
+
+The API never seeds data during startup. To load the demonstration products into an empty database, run:
+
+```bash
+go run ./cmd/seed
+```
+
+With Docker Compose:
+
+```bash
+docker compose run --rm app seed
+```
+
+The command skips execution when product stock records already exist.
+
+### 4. Run the application
 
 ```bash
 go run ./cmd
@@ -164,6 +179,14 @@ Requires the application running (`docker compose up -d` or `go run ./cmd`):
 
 ```bash
 go test ./tests/benchmark -run '^$' -bench . -benchmem
+```
+
+### E2E contract tests
+
+Runs against an isolated PostgreSQL environment and removes it afterward:
+
+```bash
+make e2e
 ```
 
 ---
