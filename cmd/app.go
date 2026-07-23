@@ -84,10 +84,15 @@ func NewPaginationConfig(paginationDefaultLimitStr, paginationMaxLimitStr string
 }
 
 func NewPriorityPolicy(
+	usePolicy bool,
 	negativeStockFactorStr,
 	leadTimeFactorStr,
 	zeroSalesFactorStr string,
 ) domain.PriorityPolicy {
+	if !usePolicy {
+		return domain.PriorityPolicy{}
+	}
+
 	negativeStockFactor, err := strconv.ParseFloat(negativeStockFactorStr, 64)
 	if err != nil {
 		panic("invalid PRIORITY_NEGATIVE_STOCK_FACTOR")
@@ -104,6 +109,7 @@ func NewPriorityPolicy(
 	}
 
 	return domain.PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: negativeStockFactor,
 		LeadTimeFactor:      leadTimeFactor,
 		ZeroSalesFactor:     zeroSalesFactor,

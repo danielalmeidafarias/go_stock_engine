@@ -16,6 +16,7 @@ func TestCalculateStockPriority_NormalScenario(t *testing.T) {
 		CriticalityLevel:  High,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 1.5,
 		LeadTimeFactor:      1.2,
 		ZeroSalesFactor:     0.5,
@@ -41,6 +42,63 @@ func TestCalculateStockPriority_NormalScenario(t *testing.T) {
 	}
 }
 
+func TestCalculateStockPriority_PolicyDisabled(t *testing.T) {
+	p := ProductStock{
+		CurrentStock:      100,
+		MinimumStock:      50,
+		AverageDailySales: 10,
+		LeadTimeDays:      5,
+		CriticalityLevel:  High,
+	}
+
+	result := p.CalculateStockPriority(PriorityPolicy{
+		NegativeStockFactor: 2.0,
+		LeadTimeFactor:      2.0,
+		ZeroSalesFactor:     0.5,
+	})
+
+	if result.UrgencyScore != 0 {
+		t.Errorf("UrgencyScore: got %v, want 0", result.UrgencyScore)
+	}
+}
+
+func TestCalculateStockPriority_PolicyDisabledIgnoresNegativeStockAndLeadTime(t *testing.T) {
+	p := ProductStock{
+		CurrentStock:      -10,
+		MinimumStock:      50,
+		AverageDailySales: 5,
+		LeadTimeDays:      3,
+		CriticalityLevel:  High,
+	}
+
+	result := p.CalculateStockPriority(PriorityPolicy{
+		NegativeStockFactor: 2.0,
+		LeadTimeFactor:      1.2,
+	})
+
+	if result.UrgencyScore != 225 {
+		t.Errorf("UrgencyScore: got %v, want 225", result.UrgencyScore)
+	}
+}
+
+func TestCalculateStockPriority_PolicyDisabledIgnoresZeroSalesFactor(t *testing.T) {
+	p := ProductStock{
+		CurrentStock:     10,
+		MinimumStock:     50,
+		LeadTimeDays:     5,
+		CriticalityLevel: Moderate,
+	}
+
+	result := p.CalculateStockPriority(PriorityPolicy{
+		LeadTimeFactor:  1.2,
+		ZeroSalesFactor: 0.3,
+	})
+
+	if result.UrgencyScore != 80 {
+		t.Errorf("UrgencyScore: got %v, want 80", result.UrgencyScore)
+	}
+}
+
 func TestCalculateStockPriority_RestockNeeded(t *testing.T) {
 	p := ProductStock{
 		Name:              "Engine Part A",
@@ -53,6 +111,7 @@ func TestCalculateStockPriority_RestockNeeded(t *testing.T) {
 		CriticalityLevel:  Critical,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 1.5,
 		LeadTimeFactor:      1.2,
 		ZeroSalesFactor:     0.5,
@@ -91,6 +150,7 @@ func TestCalculateStockPriority_NegativeStock(t *testing.T) {
 		CriticalityLevel:  High,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 2.0,
 		LeadTimeFactor:      1.2,
 		ZeroSalesFactor:     0.5,
@@ -124,6 +184,7 @@ func TestCalculateStockPriority_NegativeStockFactorNotApplied(t *testing.T) {
 		CriticalityLevel:  Low,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 0.8,
 		LeadTimeFactor:      0.5,
 		ZeroSalesFactor:     0.5,
@@ -151,6 +212,7 @@ func TestCalculateStockPriority_ZeroSalesPositiveUrgency(t *testing.T) {
 		CriticalityLevel:  Moderate,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 1.5,
 		LeadTimeFactor:      1.2,
 		ZeroSalesFactor:     0.3,
@@ -182,6 +244,7 @@ func TestCalculateStockPriority_ZeroSalesNegativeUrgency(t *testing.T) {
 		CriticalityLevel:  Low,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 1.5,
 		LeadTimeFactor:      0.5,
 		ZeroSalesFactor:     0.5,
@@ -212,6 +275,7 @@ func TestCalculateStockPriority_ZeroSalesFactorNotApplied(t *testing.T) {
 		CriticalityLevel:  Low,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 1.5,
 		LeadTimeFactor:      0.5,
 		ZeroSalesFactor:     1.5,
@@ -237,6 +301,7 @@ func TestCalculateStockPriority_HighLeadTime(t *testing.T) {
 		CriticalityLevel:  VeryHigh,
 	}
 	policy := PriorityPolicy{
+		UsePolicy:           true,
 		NegativeStockFactor: 1.5,
 		LeadTimeFactor:      1.5,
 		ZeroSalesFactor:     0.5,

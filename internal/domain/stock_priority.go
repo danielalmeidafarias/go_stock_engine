@@ -30,6 +30,7 @@ type ProductStockPriority struct {
 }
 
 type PriorityPolicy struct {
+	UsePolicy           bool
 	NegativeStockFactor float64
 	LeadTimeFactor      float64
 	ZeroSalesFactor     float64
@@ -42,7 +43,7 @@ type PriorityPolicy struct {
 // difference between the minimum required stock and the projected stock after expected
 // consumption. This deficit is weighted by the product's criticality level.
 //
-// Policy adjustments:
+// Optional policy adjustments, when enabled:
 //   - NegativeStockFactor increases urgency when the current stock is below zero.
 //   - LeadTimeFactor increases urgency proportionally to the lead time.
 //   - ZeroSalesFactor reduces urgency when the product has no average daily sales.
@@ -63,6 +64,25 @@ func (p ProductStock) CalculateStockPriority(policy PriorityPolicy) ProductStock
 	restockNeeded := projectedStock < minStock
 
 	urgencyScore := float64((minStock - projectedStock) * criticality)
+	urgencyScore = p.ApplyPolicies(urgencyScore, policy)
+
+	return ProductStockPriority{
+		ExpectedConsumption: expectedConsumption,
+		ProjectedStock:      projectedStock,
+		UrgencyScore:        urgencyScore,
+		RestockNeeded:       restockNeeded,
+		ProductStock:        &p,
+	}
+}
+
+// ApplyPolicies adjusts the urgency score when priority policies are enabled.
+func (p ProductStock) ApplyPolicies(urgencyScore float64, policy PriorityPolicy) float64 {
+	if !policy.UsePolicy {
+		return urgencyScore
+	}
+
+	avgSales := max(p.AverageDailySales, 0)
+	leadTime := max(p.LeadTimeDays, 1)
 
 	if p.CurrentStock < 0 && policy.NegativeStockFactor > 1 {
 		urgencyScore += (policy.NegativeStockFactor * (float64(p.CurrentStock) * -1))
@@ -80,13 +100,7 @@ func (p ProductStock) CalculateStockPriority(policy PriorityPolicy) ProductStock
 		}
 	}
 
-	return ProductStockPriority{
-		ExpectedConsumption: expectedConsumption,
-		ProjectedStock:      projectedStock,
-		UrgencyScore:        urgencyScore,
-		RestockNeeded:       restockNeeded,
-		ProductStock:        &p,
-	}
+	return urgencyScore
 }
 
 // HasHigherPriorityThan determines whether the current ProductStockPriority
