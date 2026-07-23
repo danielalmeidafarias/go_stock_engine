@@ -1,6 +1,8 @@
 package mocks
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 )
 
@@ -14,26 +16,26 @@ type MockProductStockRepository struct {
 	DeleteProductStockFn func(id string) *domain.Error
 }
 
-func (m *MockProductStockRepository) Create(in *domain.ProductStock) (string, *domain.Error) {
+func (m *MockProductStockRepository) Create(_ context.Context, in *domain.ProductStock) (string, *domain.Error) {
 	return m.CreateFn(in)
 }
 
-func (m *MockProductStockRepository) Update(in *domain.ProductStock) *domain.Error {
+func (m *MockProductStockRepository) Update(_ context.Context, in *domain.ProductStock) *domain.Error {
 	return m.UpdateFn(in)
 }
 
-func (m *MockProductStockRepository) GetAll(pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+func (m *MockProductStockRepository) GetAll(_ context.Context, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	return m.GetAllFn(pagination)
 }
 
-func (m *MockProductStockRepository) GetOneByID(id string) (*domain.ProductStock, *domain.Error) {
+func (m *MockProductStockRepository) GetOneByID(_ context.Context, id string) (*domain.ProductStock, *domain.Error) {
 	return m.GetOneByIDFn(id)
 }
 
-func (m *MockProductStockRepository) GetByCategory(category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+func (m *MockProductStockRepository) GetByCategory(_ context.Context, category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	return m.GetByCategoryFn(category, pagination)
 }
 
-func (m *MockProductStockRepository) DeleteProductStock(id string) *domain.Error {
+func (m *MockProductStockRepository) DeleteProductStock(_ context.Context, id string) *domain.Error {
 	return m.DeleteProductStockFn(id)
 }

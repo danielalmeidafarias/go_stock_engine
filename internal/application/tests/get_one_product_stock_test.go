@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -17,7 +18,7 @@ func TestGetOneProductStock_Success(t *testing.T) {
 	}
 	uc := usecases.NewGetOneProductStockUseCase(repo)
 
-	product, err := uc.Execute("uuid-1")
+	product, err := uc.Execute(context.Background(), "uuid-1")
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}
@@ -30,7 +31,7 @@ func TestGetOneProductStock_EmptyID(t *testing.T) {
 	repo := &mocks.MockProductStockRepository{}
 	uc := usecases.NewGetOneProductStockUseCase(repo)
 
-	_, err := uc.Execute("")
+	_, err := uc.Execute(context.Background(), "")
 	if err == nil {
 		t.Fatal("expected error for empty id")
 	}
@@ -47,7 +48,7 @@ func TestGetOneProductStock_NotFound(t *testing.T) {
 	}
 	uc := usecases.NewGetOneProductStockUseCase(repo)
 
-	_, err := uc.Execute("nonexistent")
+	_, err := uc.Execute(context.Background(), "nonexistent")
 	if err == nil {
 		t.Fatal("expected not found error")
 	}

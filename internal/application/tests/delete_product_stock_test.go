@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -20,7 +21,7 @@ func TestDeleteProductStock_Success(t *testing.T) {
 	}
 	uc := usecases.NewDeleteProductStockUseCase(repo)
 
-	err := uc.Execute("uuid-1")
+	err := uc.Execute(context.Background(), "uuid-1")
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}
@@ -30,7 +31,7 @@ func TestDeleteProductStock_EmptyID(t *testing.T) {
 	repo := &mocks.MockProductStockRepository{}
 	uc := usecases.NewDeleteProductStockUseCase(repo)
 
-	err := uc.Execute("")
+	err := uc.Execute(context.Background(), "")
 	if err == nil {
 		t.Fatal("expected error for empty id")
 	}
@@ -47,7 +48,7 @@ func TestDeleteProductStock_NotFound(t *testing.T) {
 	}
 	uc := usecases.NewDeleteProductStockUseCase(repo)
 
-	err := uc.Execute("nonexistent")
+	err := uc.Execute(context.Background(), "nonexistent")
 	if err == nil {
 		t.Fatal("expected not found error")
 	}

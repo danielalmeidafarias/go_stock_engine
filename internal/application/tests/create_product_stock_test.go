@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -16,7 +17,7 @@ func TestCreateProductStock_Success(t *testing.T) {
 	}
 	uc := usecases.NewCreateProductStockUseCase(repo)
 
-	id, err := uc.Execute(usecases.CreateProductStockDTO{
+	id, err := uc.Execute(context.Background(), usecases.CreateProductStockDTO{
 		Name:              "Engine Oil",
 		Category:          "engine",
 		CurrentStock:      100,
@@ -39,7 +40,7 @@ func TestCreateProductStock_ValidationError(t *testing.T) {
 	repo := &mocks.MockProductStockRepository{}
 	uc := usecases.NewCreateProductStockUseCase(repo)
 
-	_, err := uc.Execute(usecases.CreateProductStockDTO{
+	_, err := uc.Execute(context.Background(), usecases.CreateProductStockDTO{
 		Name:             "", // missing name
 		Category:         "engine",
 		UnitCost:         25.0,
@@ -65,7 +66,7 @@ func TestCreateProductStock_AcceptsCustomCategory(t *testing.T) {
 	}
 	uc := usecases.NewCreateProductStockUseCase(repo)
 
-	_, err := uc.Execute(usecases.CreateProductStockDTO{
+	_, err := uc.Execute(context.Background(), usecases.CreateProductStockDTO{
 		Name:             "Test",
 		Category:         "suspension",
 		UnitCost:         25.0,
@@ -85,7 +86,7 @@ func TestCreateProductStock_RepoError(t *testing.T) {
 	}
 	uc := usecases.NewCreateProductStockUseCase(repo)
 
-	_, err := uc.Execute(usecases.CreateProductStockDTO{
+	_, err := uc.Execute(context.Background(), usecases.CreateProductStockDTO{
 		Name:              "Engine Oil",
 		Category:          "engine",
 		CurrentStock:      100,

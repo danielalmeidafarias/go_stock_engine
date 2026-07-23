@@ -12,6 +12,7 @@ type Config interface {
 	HandlerType() string
 	Pagination() PaginationConfig
 	PriorityPolicy() PriorityPolicyConfig
+	RequestTimeout() RequestTimeoutConfig
 }
 
 type EnvironmentConfig struct{}
@@ -31,6 +32,11 @@ type PriorityPolicyConfig struct {
 type DatabaseConfig struct {
 	Driver           string
 	ConnectionString string
+}
+
+type RequestTimeoutConfig struct {
+	Enabled  string
+	Duration string
 }
 
 func Load() Config {
@@ -66,4 +72,18 @@ func (EnvironmentConfig) PriorityPolicy() PriorityPolicyConfig {
 		LeadTimeFactor:      os.Getenv("PRIORITY_LEAD_TIME_FACTOR"),
 		ZeroSalesFactor:     os.Getenv("PRIORITY_ZERO_SALES_FACTOR"),
 	}
+}
+
+func (EnvironmentConfig) RequestTimeout() RequestTimeoutConfig {
+	enabled := os.Getenv("REQUEST_TIMEOUT_ENABLED")
+	if enabled == "" {
+		enabled = "true"
+	}
+
+	duration := os.Getenv("REQUEST_TIMEOUT")
+	if duration == "" {
+		duration = "5s"
+	}
+
+	return RequestTimeoutConfig{Enabled: enabled, Duration: duration}
 }

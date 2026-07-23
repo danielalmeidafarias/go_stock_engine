@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
@@ -22,14 +24,14 @@ type GetByCategoryDTO struct {
 	Pagination domain.Pagination
 }
 
-func (uc *GetByCategoryProductStockUseCase) Execute(dto GetByCategoryDTO) ([]*domain.ProductStock, *domain.Error) {
+func (uc *GetByCategoryProductStockUseCase) Execute(ctx context.Context, dto GetByCategoryDTO) ([]*domain.ProductStock, *domain.Error) {
 	if dto.Category == "" {
 		return nil, domain.NewError("category is required", domain.ErrBadRequest)
 	}
 
 	domain.ApplyPaginationRules(&dto.Pagination, uc.paginationConfig)
 
-	products, err := uc.repo.GetByCategory(dto.Category, &dto.Pagination)
+	products, err := uc.repo.GetByCategory(ctx, dto.Category, &dto.Pagination)
 	if err != nil {
 		return nil, err
 	}

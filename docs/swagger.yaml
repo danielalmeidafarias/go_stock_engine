@@ -134,6 +134,10 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/http.errorResponseDTO'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/http.errorResponseDTO'
       summary: Get restock priorities
       tags:
       - restock
@@ -162,6 +166,10 @@ paths:
             type: array
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponseDTO'
+        "504":
+          description: Gateway Timeout
           schema:
             $ref: '#/definitions/http.errorResponseDTO'
       summary: List all product stocks
@@ -193,6 +201,10 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/http.errorResponseDTO'
+        "504":
+          description: Gateway Timeout
+          schema:
+            $ref: '#/definitions/http.errorResponseDTO'
       summary: Create a product stock
       tags:
       - stock
@@ -220,6 +232,10 @@ paths:
             $ref: '#/definitions/http.errorResponseDTO'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponseDTO'
+        "504":
+          description: Gateway Timeout
           schema:
             $ref: '#/definitions/http.errorResponseDTO'
       summary: Delete a product stock
@@ -250,6 +266,10 @@ paths:
             $ref: '#/definitions/http.errorResponseDTO'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponseDTO'
+        "504":
+          description: Gateway Timeout
           schema:
             $ref: '#/definitions/http.errorResponseDTO'
       summary: Get a product stock by ID
@@ -286,6 +306,10 @@ paths:
             $ref: '#/definitions/http.errorResponseDTO'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponseDTO'
+        "504":
+          description: Gateway Timeout
           schema:
             $ref: '#/definitions/http.errorResponseDTO'
       summary: Update a product stock
@@ -325,6 +349,10 @@ paths:
             $ref: '#/definitions/http.errorResponseDTO'
         "500":
           description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.errorResponseDTO'
+        "504":
+          description: Gateway Timeout
           schema:
             $ref: '#/definitions/http.errorResponseDTO'
       summary: Get product stocks by category

@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -19,7 +20,7 @@ func TestGetByCategoryProductStock_Success(t *testing.T) {
 	config := domain.PaginationConfig{DefaultLimit: 20, MaxLimit: 100}
 	uc := usecases.NewGetByCategoryProductStockUseCase(repo, config)
 
-	products, err := uc.Execute(usecases.GetByCategoryDTO{
+	products, err := uc.Execute(context.Background(), usecases.GetByCategoryDTO{
 		Category:   "engine",
 		Pagination: domain.Pagination{Page: 1, Limit: 10},
 	})
@@ -37,7 +38,7 @@ func TestGetByCategoryProductStock_EmptyCategory(t *testing.T) {
 	config := domain.PaginationConfig{DefaultLimit: 20, MaxLimit: 100}
 	uc := usecases.NewGetByCategoryProductStockUseCase(repo, config)
 
-	_, err := uc.Execute(usecases.GetByCategoryDTO{
+	_, err := uc.Execute(context.Background(), usecases.GetByCategoryDTO{
 		Category:   "",
 		Pagination: domain.Pagination{Page: 1, Limit: 10},
 	})
@@ -59,7 +60,7 @@ func TestGetByCategoryProductStock_RepoError(t *testing.T) {
 	config := domain.PaginationConfig{DefaultLimit: 20, MaxLimit: 100}
 	uc := usecases.NewGetByCategoryProductStockUseCase(repo, config)
 
-	_, err := uc.Execute(usecases.GetByCategoryDTO{
+	_, err := uc.Execute(context.Background(), usecases.GetByCategoryDTO{
 		Category:   "engine",
 		Pagination: domain.Pagination{Page: 1, Limit: 10},
 	})

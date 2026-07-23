@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
@@ -26,7 +28,7 @@ type CreateProductStockDTO struct {
 	CriticalityLevel  int
 }
 
-func (uc *CreateProductStockUseCase) Execute(dto CreateProductStockDTO) (string, *domain.Error) {
+func (uc *CreateProductStockUseCase) Execute(ctx context.Context, dto CreateProductStockDTO) (string, *domain.Error) {
 	productStock, err := domain.NewProductStock(
 		nil,
 		dto.Name,
@@ -42,5 +44,5 @@ func (uc *CreateProductStockUseCase) Execute(dto CreateProductStockDTO) (string,
 		return "", err
 	}
 
-	return uc.repo.Create(productStock)
+	return uc.repo.Create(ctx, productStock)
 }

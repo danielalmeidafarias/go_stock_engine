@@ -28,3 +28,17 @@ func TestEnvironmentConfig(t *testing.T) {
 		t.Errorf("Database().ConnectionString = %q", got)
 	}
 }
+
+func TestEnvironmentConfigRequestTimeoutDefaults(t *testing.T) {
+	t.Setenv("REQUEST_TIMEOUT_ENABLED", "")
+	t.Setenv("REQUEST_TIMEOUT", "")
+
+	timeout := EnvironmentConfig{}.RequestTimeout()
+
+	if timeout.Enabled != "true" {
+		t.Errorf("RequestTimeout().Enabled = %q, want true", timeout.Enabled)
+	}
+	if timeout.Duration != "5s" {
+		t.Errorf("RequestTimeout().Duration = %q, want 5s", timeout.Duration)
+	}
+}

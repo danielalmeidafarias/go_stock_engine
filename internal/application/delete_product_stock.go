@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
@@ -15,15 +17,15 @@ func NewDeleteProductStockUseCase(repo repository.IProductStockRepository) *Dele
 	}
 }
 
-func (uc *DeleteProductStockUseCase) Execute(id string) *domain.Error {
+func (uc *DeleteProductStockUseCase) Execute(ctx context.Context, id string) *domain.Error {
 	if id == "" {
 		return domain.NewError("id is required", domain.ErrBadRequest)
 	}
 
-	_, err := uc.repo.GetOneByID(id)
+	_, err := uc.repo.GetOneByID(ctx, id)
 	if err != nil {
 		return err
 	}
 
-	return uc.repo.DeleteProductStock(id)
+	return uc.repo.DeleteProductStock(ctx, id)
 }

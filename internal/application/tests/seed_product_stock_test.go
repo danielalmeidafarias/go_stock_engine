@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -20,7 +21,7 @@ func TestSeedProductStock_CreatesProductsForEmptyRepository(t *testing.T) {
 		},
 	}
 
-	err := usecases.NewSeedProductStockUseCase(repo).Execute()
+	err := usecases.NewSeedProductStockUseCase(repo).Execute(context.Background())
 
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
@@ -44,7 +45,7 @@ func TestSeedProductStock_SkipsNonEmptyRepository(t *testing.T) {
 		},
 	}
 
-	if err := usecases.NewSeedProductStockUseCase(repo).Execute(); err != nil {
+	if err := usecases.NewSeedProductStockUseCase(repo).Execute(context.Background()); err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}
 }

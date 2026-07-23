@@ -2,6 +2,7 @@ package main
 
 import (
 	"strconv"
+	"time"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/config"
@@ -26,6 +27,8 @@ func AppHandlerFactory(
 	paginationConfig domain.PaginationConfig,
 	repo repository.IProductStockRepository,
 	priorityPolicy domain.PriorityPolicy,
+	requestTimeoutEnabled bool,
+	requestTimeout time.Duration,
 ) domain.App {
 	createUC := usecases.NewCreateProductStockUseCase(repo)
 	getAllUC := usecases.NewGetAllProductStockUseCase(repo, paginationConfig)
@@ -47,10 +50,24 @@ func AppHandlerFactory(
 			getPriorityUC,
 		)
 
-		return http.NewGinApp(productStockHandler)
+		return http.NewGinApp(productStockHandler, requestTimeoutEnabled, requestTimeout)
 	default:
 		panic("invalid handler type")
 	}
+}
+
+func NewRequestTimeoutConfig(enabledStr, durationStr string) (bool, time.Duration) {
+	enabled, err := strconv.ParseBool(enabledStr)
+	if err != nil {
+		panic("invalid REQUEST_TIMEOUT_ENABLED")
+	}
+
+	duration, err := time.ParseDuration(durationStr)
+	if err != nil || duration <= 0 {
+		panic("invalid REQUEST_TIMEOUT")
+	}
+
+	return enabled, duration
 }
 
 func NewPaginationConfig(paginationDefaultLimitStr, paginationMaxLimitStr string) domain.PaginationConfig {

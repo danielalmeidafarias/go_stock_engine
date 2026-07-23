@@ -14,6 +14,7 @@ func main() {
 	handlerType := HandlerType(configuration.HandlerType())
 	pagination := configuration.Pagination()
 	policyConfig := configuration.PriorityPolicy()
+	timeoutConfig := configuration.RequestTimeout()
 	usePriorityPolicy := false
 	if usePriorityPolicyStr := policyConfig.UsePolicy; usePriorityPolicyStr != "" {
 		var err error
@@ -29,9 +30,17 @@ func main() {
 		policyConfig.LeadTimeFactor,
 		policyConfig.ZeroSalesFactor,
 	)
+	requestTimeoutEnabled, requestTimeout := NewRequestTimeoutConfig(timeoutConfig.Enabled, timeoutConfig.Duration)
 
 	productStockRepository := ProductStockRepositoryFactory(database)
-	appHandler := AppHandlerFactory(handlerType, paginationConfig, productStockRepository, priorityPolicy)
+	appHandler := AppHandlerFactory(
+		handlerType,
+		paginationConfig,
+		productStockRepository,
+		priorityPolicy,
+		requestTimeoutEnabled,
+		requestTimeout,
+	)
 
 	appHandler.Run()
 }

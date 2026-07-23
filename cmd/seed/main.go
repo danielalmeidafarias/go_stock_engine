@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"log"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -11,7 +12,7 @@ import (
 func main() {
 	configuration := config.Load()
 	repository := factory.NewProductStockRepository(configuration.Database())
-	if err := usecases.NewSeedProductStockUseCase(repository).Execute(); err != nil {
+	if err := usecases.NewSeedProductStockUseCase(repository).Execute(context.Background()); err != nil {
 		log.Fatal("failed to seed database: ", err)
 	}
 }

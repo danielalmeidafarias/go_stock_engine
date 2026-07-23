@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"sort"
 
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
@@ -25,10 +26,10 @@ func NewGetProductPriorityUseCase(
 	}
 }
 
-func (uc *GetProductPriorityUseCase) Execute(pagination domain.Pagination) ([]domain.ProductStockPriority, *domain.Error) {
+func (uc *GetProductPriorityUseCase) Execute(ctx context.Context, pagination domain.Pagination) ([]domain.ProductStockPriority, *domain.Error) {
 	domain.ApplyPaginationRules(&pagination, uc.paginationConfig)
 
-	products, err := uc.repo.GetAll(nil)
+	products, err := uc.repo.GetAll(ctx, nil)
 	if err != nil {
 		return nil, err
 	}

@@ -56,6 +56,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/http.errorResponseDTO"
                         }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
                     }
                 }
             }
@@ -101,6 +107,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/http.errorResponseDTO"
                         }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
                     }
                 }
             },
@@ -142,6 +154,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
                         "schema": {
                             "$ref": "#/definitions/http.errorResponseDTO"
                         }
@@ -203,6 +221,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/http.errorResponseDTO"
                         }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
                     }
                 }
             }
@@ -247,6 +271,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
                         "schema": {
                             "$ref": "#/definitions/http.errorResponseDTO"
                         }
@@ -304,6 +334,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/http.errorResponseDTO"
                         }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
                     }
                 }
             },
@@ -343,6 +379,12 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
                         "schema": {
                             "$ref": "#/definitions/http.errorResponseDTO"
                         }

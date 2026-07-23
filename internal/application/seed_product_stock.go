@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
@@ -66,8 +68,8 @@ func NewSeedProductStockUseCase(repo repository.IProductStockRepository) *SeedPr
 	return &SeedProductStockUseCase{repo: repo}
 }
 
-func (uc *SeedProductStockUseCase) Execute() *domain.Error {
-	products, err := uc.repo.GetAll(nil)
+func (uc *SeedProductStockUseCase) Execute(ctx context.Context) *domain.Error {
+	products, err := uc.repo.GetAll(ctx, nil)
 	if err != nil {
 		return err
 	}
@@ -77,7 +79,7 @@ func (uc *SeedProductStockUseCase) Execute() *domain.Error {
 
 	createProductStock := NewCreateProductStockUseCase(uc.repo)
 	for _, product := range seedProductStocks {
-		if _, err := createProductStock.Execute(product); err != nil {
+		if _, err := createProductStock.Execute(ctx, product); err != nil {
 			return err
 		}
 	}
