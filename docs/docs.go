@@ -45,10 +45,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/http.restockPrioritiesResponseDTO"
-                            }
+                            "$ref": "#/definitions/http.restockPrioritiesResponseDTO"
                         }
                     },
                     "500": {

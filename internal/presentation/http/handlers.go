@@ -284,7 +284,7 @@ func (h *ProductStockHandler) GetByCategory(c *gin.Context) {
 // @Produce      json
 // @Param        page   query     int  false  "Page number"    default(1)
 // @Param        limit  query     int  false  "Items per page" default(20)
-// @Success      200    {array}   restockPrioritiesResponseDTO
+// @Success      200    {object}  restockPrioritiesResponseDTO
 // @Failure      500    {object}  errorResponseDTO
 // @Failure      504    {object}  errorResponseDTO
 // @Router       /restock/priorities [get]
