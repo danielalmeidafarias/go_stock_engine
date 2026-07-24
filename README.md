@@ -203,6 +203,14 @@ Runs against an isolated PostgreSQL environment and removes it afterward:
 make e2e
 ```
 
+To run the same flow without Make:
+
+```bash
+docker compose -f compose.e2e.yaml up -d --build
+go test ./tests/e2e -v -count=1
+docker compose -f compose.e2e.yaml down -v
+```
+
 ---
 
 ## Swagger
