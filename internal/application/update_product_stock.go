@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
@@ -25,12 +27,12 @@ type UpdateProductStockDTO struct {
 	CriticalityLevel  *int
 }
 
-func (uc *UpdateProductStockUseCase) Execute(dto UpdateProductStockDTO) *domain.Error {
+func (uc *UpdateProductStockUseCase) Execute(ctx context.Context, dto UpdateProductStockDTO) *domain.Error {
 	if dto.ID == "" {
 		return domain.NewError("id is required", domain.ErrBadRequest)
 	}
 
-	p, err := uc.repo.GetOneByID(dto.ID)
+	p, err := uc.repo.GetOneByID(ctx, dto.ID)
 	if err != nil {
 		return err
 	}
@@ -75,5 +77,5 @@ func (uc *UpdateProductStockUseCase) Execute(dto UpdateProductStockDTO) *domain.
 		return err
 	}
 
-	return uc.repo.Update(p)
+	return uc.repo.Update(ctx, p)
 }

@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -26,7 +27,7 @@ func TestGetProductPriority_Success(t *testing.T) {
 	}
 	uc := usecases.NewGetProductPriorityUseCase(repo, config, policy)
 
-	priorities, err := uc.Execute(domain.Pagination{Page: 1, Limit: 10})
+	priorities, err := uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 10})
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}
@@ -53,7 +54,7 @@ func TestGetProductPriority_EmptyList(t *testing.T) {
 	policy := domain.PriorityPolicy{}
 	uc := usecases.NewGetProductPriorityUseCase(repo, config, policy)
 
-	priorities, err := uc.Execute(domain.Pagination{Page: 1, Limit: 10})
+	priorities, err := uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 10})
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}
@@ -72,7 +73,7 @@ func TestGetProductPriority_RepoError(t *testing.T) {
 	policy := domain.PriorityPolicy{}
 	uc := usecases.NewGetProductPriorityUseCase(repo, config, policy)
 
-	_, err := uc.Execute(domain.Pagination{Page: 1, Limit: 10})
+	_, err := uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 10})
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -90,7 +91,7 @@ func TestGetProductPriority_NoRestockNeeded(t *testing.T) {
 	policy := domain.PriorityPolicy{}
 	uc := usecases.NewGetProductPriorityUseCase(repo, config, policy)
 
-	priorities, err := uc.Execute(domain.Pagination{Page: 1, Limit: 10})
+	priorities, err := uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 10})
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}
@@ -117,7 +118,7 @@ func TestGetProductPriority_SortOrder(t *testing.T) {
 	}
 	uc := usecases.NewGetProductPriorityUseCase(repo, config, policy)
 
-	priorities, err := uc.Execute(domain.Pagination{Page: 1, Limit: 10})
+	priorities, err := uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 10})
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}

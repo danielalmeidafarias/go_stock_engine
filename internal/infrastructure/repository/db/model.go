@@ -21,7 +21,7 @@ func (m *ProductStockModel) ToDomain() *domain.ProductStock {
 	return &domain.ProductStock{
 		ID:                &id,
 		Name:              m.Name,
-		Category:          domain.ProductCategory(m.Category),
+		Category:          m.Category,
 		CurrentStock:      m.CurrentStock,
 		MinimumStock:      m.MinimumStock,
 		AverageDailySales: m.AverageDailySales,
@@ -34,7 +34,7 @@ func (m *ProductStockModel) ToDomain() *domain.ProductStock {
 func MapProductStockToModel(e *domain.ProductStock) *ProductStockModel {
 	model := &ProductStockModel{
 		Name:              e.Name,
-		Category:          string(e.Category),
+		Category:          e.Category,
 		CurrentStock:      e.CurrentStock,
 		MinimumStock:      e.MinimumStock,
 		AverageDailySales: e.AverageDailySales,

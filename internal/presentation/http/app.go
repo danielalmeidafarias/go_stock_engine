@@ -1,7 +1,9 @@
 package http
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -18,8 +20,9 @@ func (g GinApp) Run() {
 	}
 }
 
-func NewGinApp(handler *ProductStockHandler) GinApp {
+func NewGinApp(handler *ProductStockHandler, requestTimeoutEnabled bool, requestTimeout time.Duration) GinApp {
 	r := gin.Default()
+	r.Use(requestTimeoutMiddleware(requestTimeoutEnabled, requestTimeout))
 
 	stock := r.Group("/stock")
 	{
@@ -37,5 +40,20 @@ func NewGinApp(handler *ProductStockHandler) GinApp {
 
 	return GinApp{
 		gin: r,
+	}
+}
+
+func requestTimeoutMiddleware(enabled bool, timeout time.Duration) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !enabled {
+			c.Next()
+			return
+		}
+
+		ctx, cancel := context.WithTimeout(c.Request.Context(), timeout)
+		defer cancel()
+
+		c.Request = c.Request.WithContext(ctx)
+		c.Next()
 	}
 }

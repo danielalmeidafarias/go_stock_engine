@@ -1,6 +1,8 @@
 package db
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"gorm.io/gorm"
 )
@@ -13,20 +15,20 @@ func NewProductStockRepository(gorm *gorm.DB) *ProductStockRepository {
 	return &ProductStockRepository{db: gorm}
 }
 
-func (r *ProductStockRepository) Create(in *domain.ProductStock) (string, *domain.Error) {
+func (r *ProductStockRepository) Create(ctx context.Context, in *domain.ProductStock) (string, *domain.Error) {
 	model := MapProductStockToModel(in)
 
-	if err := r.db.Create(model).Error; err != nil {
+	if err := r.db.WithContext(ctx).Create(model).Error; err != nil {
 		return "", r.MapErrorToDomain(err, "failed to create product")
 	}
 
 	return model.ID, nil
 }
 
-func (r *ProductStockRepository) Update(in *domain.ProductStock) *domain.Error {
+func (r *ProductStockRepository) Update(ctx context.Context, in *domain.ProductStock) *domain.Error {
 	model := MapProductStockToModel(in)
 
-	result := r.db.Save(model)
+	result := r.db.WithContext(ctx).Save(model)
 	if result.Error != nil {
 		return r.MapErrorToDomain(result.Error, "failed to update product")
 	}
@@ -38,10 +40,10 @@ func (r *ProductStockRepository) Update(in *domain.ProductStock) *domain.Error {
 	return nil
 }
 
-func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+func (r *ProductStockRepository) GetAll(ctx context.Context, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	var models []ProductStockModel
 
-	query := r.db.Model(&ProductStockModel{})
+	query := r.db.WithContext(ctx).Model(&ProductStockModel{})
 
 	if pagination != nil {
 		offset := (pagination.Page - 1) * pagination.Limit
@@ -60,20 +62,20 @@ func (r *ProductStockRepository) GetAll(pagination *domain.Pagination) ([]*domai
 	return result, nil
 }
 
-func (r *ProductStockRepository) GetOneByID(id string) (*domain.ProductStock, *domain.Error) {
+func (r *ProductStockRepository) GetOneByID(ctx context.Context, id string) (*domain.ProductStock, *domain.Error) {
 	var model ProductStockModel
 
-	if err := r.db.First(&model, "id = ?", id).Error; err != nil {
+	if err := r.db.WithContext(ctx).First(&model, "id = ?", id).Error; err != nil {
 		return nil, r.MapErrorToDomain(err, "failed to get product")
 	}
 
 	return model.ToDomain(), nil
 }
 
-func (r *ProductStockRepository) GetByCategory(category domain.ProductCategory, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+func (r *ProductStockRepository) GetByCategory(ctx context.Context, category string, pagination *domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	var models []ProductStockModel
 
-	query := r.db.Where("category = ?", string(category))
+	query := r.db.WithContext(ctx).Where("category = ?", category)
 
 	if pagination != nil {
 		offset := (pagination.Page - 1) * pagination.Limit
@@ -92,9 +94,9 @@ func (r *ProductStockRepository) GetByCategory(category domain.ProductCategory, 
 	return result, nil
 }
 
-func (r *ProductStockRepository) DeleteProductStock(id string) *domain.Error {
+func (r *ProductStockRepository) DeleteProductStock(ctx context.Context, id string) *domain.Error {
 
-	result := r.db.Delete(&ProductStockModel{}, "id = ?", id)
+	result := r.db.WithContext(ctx).Delete(&ProductStockModel{}, "id = ?", id)
 	if result.Error != nil {
 		return r.MapErrorToDomain(result.Error, "failed to delete product")
 	}

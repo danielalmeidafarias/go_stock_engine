@@ -46,25 +46,75 @@ cp .env.example .env
 Edit `.env` with your database credentials:
 
 ```dotenv
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=example
-POSTGRES_DB=postgres
-REPOSITORY_TYPE=POSTGRES
+DATABASE_DRIVER=POSTGRES
+DATABASE_URL=postgres://postgres:example@localhost:5432/postgres?sslmode=disable
 HANDLER_TYPE=HTTP
 PAGINATION_DEFAULT_LIMIT=20
 PAGINATION_MAX_LIMIT=100
 PRIORITY_NEGATIVE_STOCK_FACTOR=1.5
 PRIORITY_LEAD_TIME_FACTOR=1.2
 PRIORITY_ZERO_SALES_FACTOR=0.5
-SEED_FILE=internal/infrastructure/repository/db/seed.sql
+REQUEST_TIMEOUT_ENABLED=true
+REQUEST_TIMEOUT=5s
 ```
 
-### 3. Run the application
+### 3. Run migrations
+
+The API does not change the schema during startup. Apply pending migrations before
+running it:
 
 ```bash
-go run ./cmd
+go run ./cmd/migrate
+```
+
+With Docker Compose, migrations run automatically before the API starts. To run
+them manually:
+
+```bash
+docker compose run --rm migrate
+```
+
+#### Existing databases
+
+If the schema was created by the previous `AutoMigrate` flow, first confirm it
+matches migration `000001`, then mark that version as the baseline:
+
+```bash
+go run ./cmd/migrate -baseline-version=1
+```
+
+With Docker Compose, start only the database and run the baseline command without
+starting dependencies:
+
+```bash
+docker compose up -d db
+docker compose build app
+docker compose run --rm --no-deps app migrate -baseline-version=1
+```
+
+Do not use a baseline on an empty database or a schema that differs from the
+versioned migration.
+
+### 4. Seed the database (optional)
+
+The API never seeds data during startup. To load the demonstration products into an empty database, run:
+
+```bash
+go run ./cmd/seed
+```
+
+With Docker Compose:
+
+```bash
+docker compose run --rm app seed
+```
+
+The command skips execution when product stock records already exist.
+
+### 5. Run the application
+
+```bash
+go run ./cmd/app
 ```
 
 The API will be available at `http://localhost:8080`.
@@ -140,6 +190,8 @@ curl -X DELETE http://localhost:8080/stock/{id}
 curl "http://localhost:8080/restock/priorities?page=1&limit=10"
 ```
 
+> **Design decision:** Restock priorities are calculated and ordered in memory before pagination. This keeps the priority rules and configurable policy factors in the domain layer instead of duplicating business rules in database queries.
+
 ---
 
 ## Running Tests
@@ -156,12 +208,28 @@ go test -v ./internal/domain
 go test -v ./internal/application/tests
 ```
 
-### E2E tests
+### HTTP benchmarks
 
-Requires the application running (`docker compose up -d` or `go run ./cmd`):
+Requires the application running (`docker compose up -d` or `go run ./cmd/app`):
 
 ```bash
-go test ./tests/e2e/ -v -count=1
+go test ./tests/benchmark -run '^$' -bench . -benchmem
+```
+
+### E2E contract tests
+
+Runs against an isolated PostgreSQL environment and removes it afterward:
+
+```bash
+make e2e
+```
+
+To run the same flow without Make:
+
+```bash
+docker compose -f compose.e2e.yaml up -d --build
+go test ./tests/e2e -v -count=1
+docker compose -f compose.e2e.yaml down -v
 ```
 
 ---
@@ -178,5 +246,5 @@ http://localhost:8080/swagger/index.html
 
 ```bash
 go install github.com/swaggo/swag/cmd/swag@latest
-swag init -g cmd/main.go -o docs --parseInternal
+swag init -g cmd/app/main.go -o docs --parseInternal
 ```

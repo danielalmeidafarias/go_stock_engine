@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -20,7 +21,7 @@ func TestGetAllProductStock_Success(t *testing.T) {
 	config := domain.PaginationConfig{DefaultLimit: 20, MaxLimit: 100}
 	uc := usecases.NewGetAllProductStockUseCase(repo, config)
 
-	products, err := uc.Execute(domain.Pagination{Page: 1, Limit: 10})
+	products, err := uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 10})
 	if err != nil {
 		t.Fatalf("unexpected error: %s", err.Message)
 	}
@@ -38,7 +39,7 @@ func TestGetAllProductStock_RepoError(t *testing.T) {
 	config := domain.PaginationConfig{DefaultLimit: 20, MaxLimit: 100}
 	uc := usecases.NewGetAllProductStockUseCase(repo, config)
 
-	_, err := uc.Execute(domain.Pagination{Page: 1, Limit: 10})
+	_, err := uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 10})
 	if err == nil {
 		t.Fatal("expected error")
 	}
@@ -56,7 +57,7 @@ func TestGetAllProductStock_PaginationApplied(t *testing.T) {
 	uc := usecases.NewGetAllProductStockUseCase(repo, config)
 
 	// Limit exceeds max, should be capped to 50
-	uc.Execute(domain.Pagination{Page: 1, Limit: 999})
+	uc.Execute(context.Background(), domain.Pagination{Page: 1, Limit: 999})
 
 	if capturedPagination == nil {
 		t.Fatal("pagination should be passed to repo")

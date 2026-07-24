@@ -13,7 +13,7 @@ func (repo *ProductStockRepository) MapErrorToDomain(err error, context string) 
 
 	switch {
 	case errors.Is(err, gorm.ErrRecordNotFound):
-		return domain.NewError(message, domain.ErrBadRequest)
+		return domain.NewError(message, domain.ErrNotFound)
 
 	case errors.Is(err, gorm.ErrDuplicatedKey):
 		return domain.NewError(message, domain.ErrConflict)

@@ -45,16 +45,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/http.restockPriorityResponse"
-                            }
+                            "$ref": "#/definitions/http.restockPrioritiesResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     }
                 }
@@ -92,14 +95,20 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/http.productStockResponse"
+                                "$ref": "#/definitions/http.productStockResponseDTO"
                             }
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     }
                 }
@@ -123,7 +132,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.createProductStockRequest"
+                            "$ref": "#/definitions/http.createProductStockRequestDTO"
                         }
                     }
                 ],
@@ -131,19 +140,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/http.createResponse"
+                            "$ref": "#/definitions/http.createResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     }
                 }
@@ -188,20 +203,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/http.productStockResponse"
+                                "$ref": "#/definitions/http.productStockResponseDTO"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     }
                 }
@@ -230,25 +251,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/http.productStockResponse"
+                            "$ref": "#/definitions/http.productStockResponseDTO"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     }
                 }
@@ -279,7 +306,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/http.updateProductStockRequest"
+                            "$ref": "#/definitions/http.updateProductStockRequestDTO"
                         }
                     }
                 ],
@@ -290,19 +317,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     }
                 }
@@ -332,19 +365,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/http.errorResponse"
+                            "$ref": "#/definitions/http.errorResponseDTO"
+                        }
+                    },
+                    "504": {
+                        "description": "Gateway Timeout",
+                        "schema": {
+                            "$ref": "#/definitions/http.errorResponseDTO"
                         }
                     }
                 }
@@ -352,14 +391,8 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "http.createProductStockRequest": {
+        "http.createProductStockRequestDTO": {
             "type": "object",
-            "required": [
-                "category",
-                "criticality_level",
-                "name",
-                "unit_cost"
-            ],
             "properties": {
                 "average_daily_sales": {
                     "type": "integer"
@@ -387,7 +420,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.createResponse": {
+        "http.createResponseDTO": {
             "type": "object",
             "properties": {
                 "id": {
@@ -396,7 +429,7 @@ const docTemplate = `{
                 }
             }
         },
-        "http.errorResponse": {
+        "http.errorResponseDTO": {
             "type": "object",
             "properties": {
                 "error": {
@@ -405,10 +438,10 @@ const docTemplate = `{
                 }
             }
         },
-        "http.productStockResponse": {
+        "http.productStockResponseDTO": {
             "type": "object",
             "properties": {
-                "average_daily_sales": {
+                "averageDailySales": {
                     "type": "integer",
                     "example": 10
                 },
@@ -416,11 +449,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "engine"
                 },
-                "criticality_level": {
+                "criticalityLevel": {
                     "type": "integer",
                     "example": 3
                 },
-                "current_stock": {
+                "currentStock": {
                     "type": "integer",
                     "example": 150
                 },
@@ -428,11 +461,11 @@ const docTemplate = `{
                     "type": "string",
                     "example": "550e8400-e29b-41d4-a716-446655440000"
                 },
-                "lead_time_days": {
+                "leadTimeDays": {
                     "type": "integer",
                     "example": 7
                 },
-                "minimum_stock": {
+                "minimumStock": {
                     "type": "integer",
                     "example": 50
                 },
@@ -440,37 +473,53 @@ const docTemplate = `{
                     "type": "string",
                     "example": "Engine Oil Filter"
                 },
-                "unit_cost": {
+                "unitCost": {
                     "type": "number",
                     "example": 25.5
                 }
             }
         },
-        "http.restockPriorityResponse": {
+        "http.restockPrioritiesResponseDTO": {
             "type": "object",
             "properties": {
-                "expected_consumption": {
-                    "type": "integer",
-                    "example": 70
-                },
-                "is_reposition_needed": {
-                    "type": "boolean",
-                    "example": true
-                },
-                "product_stock": {
-                    "$ref": "#/definitions/http.productStockResponse"
-                },
-                "projected_stock": {
-                    "type": "integer",
-                    "example": -20
-                },
-                "urgency_score": {
-                    "type": "integer",
-                    "example": 210
+                "priorities": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/http.restockPriorityResponseDTO"
+                    }
                 }
             }
         },
-        "http.updateProductStockRequest": {
+        "http.restockPriorityResponseDTO": {
+            "type": "object",
+            "properties": {
+                "currentStock": {
+                    "type": "integer",
+                    "example": 15
+                },
+                "minimumStock": {
+                    "type": "integer",
+                    "example": 20
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Engine Oil Filter"
+                },
+                "partId": {
+                    "type": "string",
+                    "example": "550e8400-e29b-41d4-a716-446655440000"
+                },
+                "projectedStock": {
+                    "type": "integer",
+                    "example": -20
+                },
+                "urgencyScore": {
+                    "type": "integer",
+                    "example": 45
+                }
+            }
+        },
+        "http.updateProductStockRequestDTO": {
             "type": "object",
             "properties": {
                 "average_daily_sales": {

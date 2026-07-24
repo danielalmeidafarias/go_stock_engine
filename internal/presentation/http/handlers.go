@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -54,6 +55,23 @@ func mapErrorToHTTPStatus(errCode domain.ErrorCode) int {
 	}
 }
 
+func respondError(c *gin.Context, domainErr *domain.Error) {
+	if respondTimeout(c) {
+		return
+	}
+
+	c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), errorResponseDTO{Error: domainErr.Message})
+}
+
+func respondTimeout(c *gin.Context) bool {
+	if c.Request.Context().Err() != context.DeadlineExceeded {
+		return false
+	}
+
+	c.JSON(http.StatusGatewayTimeout, errorResponseDTO{Error: "request timed out"})
+	return true
+}
+
 func parsePagination(c *gin.Context) domain.Pagination {
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "0"))
@@ -64,66 +82,26 @@ func parsePagination(c *gin.Context) domain.Pagination {
 	}
 }
 
-type errorResponse struct {
-	Error string `json:"error" example:"error message"`
-}
-
-type createResponse struct {
-	ID string `json:"id" example:"uuid"`
-}
-
-// productStockResponse represents a product stock item.
-type productStockResponse struct {
-	ID                string  `json:"id" example:"550e8400-e29b-41d4-a716-446655440000"`
-	Name              string  `json:"name" example:"Engine Oil Filter"`
-	Category          string  `json:"category" example:"engine"`
-	CurrentStock      int     `json:"current_stock" example:"150"`
-	MinimumStock      int     `json:"minimum_stock" example:"50"`
-	AverageDailySales int     `json:"average_daily_sales" example:"10"`
-	LeadTimeDays      int     `json:"lead_time_days" example:"7"`
-	UnitCost          float64 `json:"unit_cost" example:"25.50"`
-	CriticalityLevel  int     `json:"criticality_level" example:"3"`
-}
-
-// restockPriorityResponse represents a product restock priority.
-type restockPriorityResponse struct {
-	ExpectedConsumption int                  `json:"expected_consumption" example:"70"`
-	ProjectedStock      int                  `json:"projected_stock" example:"-20"`
-	IsRepositionNeeded  bool                 `json:"is_reposition_needed" example:"true"`
-	UrgencyScore        int                  `json:"urgency_score" example:"210"`
-	ProductStock        productStockResponse `json:"product_stock"`
-}
-
-type createProductStockRequest struct {
-	Name              string  `json:"name"`
-	Category          string  `json:"category"`
-	CurrentStock      int     `json:"current_stock"`
-	MinimumStock      int     `json:"minimum_stock"`
-	AverageDailySales int     `json:"average_daily_sales"`
-	LeadTimeDays      int     `json:"lead_time_days"`
-	UnitCost          float64 `json:"unit_cost"`
-	CriticalityLevel  int     `json:"criticality_level"`
-}
-
 // Create godoc
 // @Summary      Create a product stock
 // @Description  Creates a new product stock entry
 // @Tags         stock
 // @Accept       json
 // @Produce      json
-// @Param        request  body      createProductStockRequest  true  "Product stock data"
-// @Success      201      {object}  createResponse
-// @Failure      400      {object}  errorResponse
-// @Failure      500      {object}  errorResponse
+// @Param        request  body      createProductStockRequestDTO  true  "Product stock data"
+// @Success      201      {object}  createResponseDTO
+// @Failure      400      {object}  errorResponseDTO
+// @Failure      500      {object}  errorResponseDTO
+// @Failure      504      {object}  errorResponseDTO
 // @Router       /stock [post]
 func (h *ProductStockHandler) Create(c *gin.Context) {
-	var req createProductStockRequest
+	var req createProductStockRequestDTO
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, errorResponseDTO{Error: err.Error()})
 		return
 	}
 
-	id, domainErr := h.createUC.Execute(usecases.CreateProductStockDTO{
+	id, domainErr := h.createUC.Execute(c.Request.Context(), usecases.CreateProductStockDTO{
 		Name:              req.Name,
 		Category:          req.Category,
 		CurrentStock:      req.CurrentStock,
@@ -134,11 +112,14 @@ func (h *ProductStockHandler) Create(c *gin.Context) {
 		CriticalityLevel:  req.CriticalityLevel,
 	})
 	if domainErr != nil {
-		c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), gin.H{"error": domainErr.Message})
+		respondError(c, domainErr)
+		return
+	}
+	if respondTimeout(c) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, createResponseDTO{ID: id})
 }
 
 // GetAll godoc
@@ -148,19 +129,23 @@ func (h *ProductStockHandler) Create(c *gin.Context) {
 // @Produce      json
 // @Param        page   query     int  false  "Page number"   default(1)
 // @Param        limit  query     int  false  "Items per page" default(20)
-// @Success      200    {array}   productStockResponse
-// @Failure      500    {object}  errorResponse
+// @Success      200    {array}   productStockResponseDTO
+// @Failure      500    {object}  errorResponseDTO
+// @Failure      504    {object}  errorResponseDTO
 // @Router       /stock [get]
 func (h *ProductStockHandler) GetAll(c *gin.Context) {
 	pagination := parsePagination(c)
 
-	products, domainErr := h.getAllUC.Execute(pagination)
+	products, domainErr := h.getAllUC.Execute(c.Request.Context(), pagination)
 	if domainErr != nil {
-		c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), gin.H{"error": domainErr.Message})
+		respondError(c, domainErr)
+		return
+	}
+	if respondTimeout(c) {
 		return
 	}
 
-	c.JSON(http.StatusOK, products)
+	c.JSON(http.StatusOK, toProductStockResponseDTOs(products))
 }
 
 // GetOne godoc
@@ -169,30 +154,25 @@ func (h *ProductStockHandler) GetAll(c *gin.Context) {
 // @Tags         stock
 // @Produce      json
 // @Param        id   path      string  true  "Product stock ID"
-// @Success      200  {object}  productStockResponse
-// @Failure      400  {object}  errorResponse
-// @Failure      404  {object}  errorResponse
-// @Failure      500  {object}  errorResponse
+// @Success      200  {object}  productStockResponseDTO
+// @Failure      400  {object}  errorResponseDTO
+// @Failure      404  {object}  errorResponseDTO
+// @Failure      500  {object}  errorResponseDTO
+// @Failure      504  {object}  errorResponseDTO
 // @Router       /stock/{id} [get]
 func (h *ProductStockHandler) GetOne(c *gin.Context) {
 	id := c.Param("id")
 
-	product, domainErr := h.getOneUC.Execute(id)
+	product, domainErr := h.getOneUC.Execute(c.Request.Context(), id)
 	if domainErr != nil {
-		c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), gin.H{"error": domainErr.Message})
+		respondError(c, domainErr)
+		return
+	}
+	if respondTimeout(c) {
 		return
 	}
 
-	c.JSON(http.StatusOK, product)
-}
-
-type updateProductStockRequest struct {
-	CurrentStock      *int     `json:"current_stock"`
-	MinimumStock      *int     `json:"minimum_stock"`
-	AverageDailySales *int     `json:"average_daily_sales"`
-	LeadTimeDays      *int     `json:"lead_time_days"`
-	UnitCost          *float64 `json:"unit_cost"`
-	CriticalityLevel  *int     `json:"criticality_level"`
+	c.JSON(http.StatusOK, toProductStockResponseDTO(product))
 }
 
 // Update godoc
@@ -202,22 +182,23 @@ type updateProductStockRequest struct {
 // @Accept       json
 // @Produce      json
 // @Param        id       path      string                     true  "Product stock ID"
-// @Param        request  body      updateProductStockRequest  true  "Fields to update"
+// @Param        request  body      updateProductStockRequestDTO  true  "Fields to update"
 // @Success      204      "No Content"
-// @Failure      400      {object}  errorResponse
-// @Failure      404      {object}  errorResponse
-// @Failure      500      {object}  errorResponse
+// @Failure      400      {object}  errorResponseDTO
+// @Failure      404      {object}  errorResponseDTO
+// @Failure      500      {object}  errorResponseDTO
+// @Failure      504      {object}  errorResponseDTO
 // @Router       /stock/{id} [put]
 func (h *ProductStockHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
-	var req updateProductStockRequest
+	var req updateProductStockRequestDTO
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, errorResponseDTO{Error: err.Error()})
 		return
 	}
 
-	domainErr := h.updateUC.Execute(usecases.UpdateProductStockDTO{
+	domainErr := h.updateUC.Execute(c.Request.Context(), usecases.UpdateProductStockDTO{
 		ID:                id,
 		CurrentStock:      req.CurrentStock,
 		MinimumStock:      req.MinimumStock,
@@ -227,7 +208,10 @@ func (h *ProductStockHandler) Update(c *gin.Context) {
 		CriticalityLevel:  req.CriticalityLevel,
 	})
 	if domainErr != nil {
-		c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), gin.H{"error": domainErr.Message})
+		respondError(c, domainErr)
+		return
+	}
+	if respondTimeout(c) {
 		return
 	}
 
@@ -241,16 +225,20 @@ func (h *ProductStockHandler) Update(c *gin.Context) {
 // @Produce      json
 // @Param        id   path      string  true  "Product stock ID"
 // @Success      204  "No Content"
-// @Failure      400  {object}  errorResponse
-// @Failure      404  {object}  errorResponse
-// @Failure      500  {object}  errorResponse
+// @Failure      400  {object}  errorResponseDTO
+// @Failure      404  {object}  errorResponseDTO
+// @Failure      500  {object}  errorResponseDTO
+// @Failure      504  {object}  errorResponseDTO
 // @Router       /stock/{id} [delete]
 func (h *ProductStockHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
-	domainErr := h.deleteUC.Execute(id)
+	domainErr := h.deleteUC.Execute(c.Request.Context(), id)
 	if domainErr != nil {
-		c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), gin.H{"error": domainErr.Message})
+		respondError(c, domainErr)
+		return
+	}
+	if respondTimeout(c) {
 		return
 	}
 
@@ -265,24 +253,28 @@ func (h *ProductStockHandler) Delete(c *gin.Context) {
 // @Param        category  path      string  true   "Product category"
 // @Param        page      query     int     false  "Page number"    default(1)
 // @Param        limit     query     int     false  "Items per page" default(20)
-// @Success      200       {array}   productStockResponse
-// @Failure      400       {object}  errorResponse
-// @Failure      500       {object}  errorResponse
+// @Success      200       {array}   productStockResponseDTO
+// @Failure      400       {object}  errorResponseDTO
+// @Failure      500       {object}  errorResponseDTO
+// @Failure      504       {object}  errorResponseDTO
 // @Router       /stock/category/{category} [get]
 func (h *ProductStockHandler) GetByCategory(c *gin.Context) {
 	category := c.Param("category")
 	pagination := parsePagination(c)
 
-	products, domainErr := h.getByCategoryUC.Execute(usecases.GetByCategoryDTO{
+	products, domainErr := h.getByCategoryUC.Execute(c.Request.Context(), usecases.GetByCategoryDTO{
 		Category:   category,
 		Pagination: pagination,
 	})
 	if domainErr != nil {
-		c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), gin.H{"error": domainErr.Message})
+		respondError(c, domainErr)
+		return
+	}
+	if respondTimeout(c) {
 		return
 	}
 
-	c.JSON(http.StatusOK, products)
+	c.JSON(http.StatusOK, toProductStockResponseDTOs(products))
 }
 
 // GetRestockPriorities godoc
@@ -292,17 +284,21 @@ func (h *ProductStockHandler) GetByCategory(c *gin.Context) {
 // @Produce      json
 // @Param        page   query     int  false  "Page number"    default(1)
 // @Param        limit  query     int  false  "Items per page" default(20)
-// @Success      200    {array}   restockPriorityResponse
-// @Failure      500    {object}  errorResponse
+// @Success      200    {object}  restockPrioritiesResponseDTO
+// @Failure      500    {object}  errorResponseDTO
+// @Failure      504    {object}  errorResponseDTO
 // @Router       /restock/priorities [get]
 func (h *ProductStockHandler) GetRestockPriorities(c *gin.Context) {
 	pagination := parsePagination(c)
 
-	priorities, domainErr := h.getPriorityUC.Execute(pagination)
+	priorities, domainErr := h.getPriorityUC.Execute(c.Request.Context(), pagination)
 	if domainErr != nil {
-		c.JSON(mapErrorToHTTPStatus(domainErr.ErrCode), gin.H{"error": domainErr.Message})
+		respondError(c, domainErr)
+		return
+	}
+	if respondTimeout(c) {
 		return
 	}
 
-	c.JSON(http.StatusOK, priorities)
+	c.JSON(http.StatusOK, toRestockPrioritiesResponseDTO(priorities))
 }

@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"context"
+
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain"
 	"github.com/danielalmeidafarias/go_stock_engine/internal/domain/repository"
 )
@@ -17,10 +19,10 @@ func NewGetAllProductStockUseCase(repo repository.IProductStockRepository, pagin
 	}
 }
 
-func (uc *GetAllProductStockUseCase) Execute(pagination domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
+func (uc *GetAllProductStockUseCase) Execute(ctx context.Context, pagination domain.Pagination) ([]*domain.ProductStock, *domain.Error) {
 	domain.ApplyPaginationRules(&pagination, uc.paginationConfig)
 
-	products, err := uc.repo.GetAll(&pagination)
+	products, err := uc.repo.GetAll(ctx, &pagination)
 	if err != nil {
 		return nil, err
 	}

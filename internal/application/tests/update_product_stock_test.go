@@ -1,6 +1,7 @@
 package usecases_test
 
 import (
+	"context"
 	"testing"
 
 	usecases "github.com/danielalmeidafarias/go_stock_engine/internal/application"
@@ -13,7 +14,7 @@ func TestUpdateProductStock_Success(t *testing.T) {
 	existingProduct := &domain.ProductStock{
 		ID:                &id,
 		Name:              "Engine Oil",
-		Category:          domain.Engine,
+		Category:          "engine",
 		CurrentStock:      100,
 		MinimumStock:      20,
 		AverageDailySales: 5,
@@ -33,7 +34,7 @@ func TestUpdateProductStock_Success(t *testing.T) {
 	uc := usecases.NewUpdateProductStockUseCase(repo)
 
 	newStock := 200
-	err := uc.Execute(usecases.UpdateProductStockDTO{
+	err := uc.Execute(context.Background(), usecases.UpdateProductStockDTO{
 		ID:           "uuid-1",
 		CurrentStock: &newStock,
 	})
@@ -47,7 +48,7 @@ func TestUpdateProductStock_EmptyID(t *testing.T) {
 	repo := &mocks.MockProductStockRepository{}
 	uc := usecases.NewUpdateProductStockUseCase(repo)
 
-	err := uc.Execute(usecases.UpdateProductStockDTO{ID: ""})
+	err := uc.Execute(context.Background(), usecases.UpdateProductStockDTO{ID: ""})
 	if err == nil {
 		t.Fatal("expected error for empty id")
 	}
@@ -65,7 +66,7 @@ func TestUpdateProductStock_NotFound(t *testing.T) {
 	uc := usecases.NewUpdateProductStockUseCase(repo)
 
 	newStock := 50
-	err := uc.Execute(usecases.UpdateProductStockDTO{
+	err := uc.Execute(context.Background(), usecases.UpdateProductStockDTO{
 		ID:           "nonexistent",
 		CurrentStock: &newStock,
 	})
@@ -83,7 +84,7 @@ func TestUpdateProductStock_InvalidFieldAfterUpdate(t *testing.T) {
 	existingProduct := &domain.ProductStock{
 		ID:                &id,
 		Name:              "Engine Oil",
-		Category:          domain.Engine,
+		Category:          "engine",
 		CurrentStock:      100,
 		MinimumStock:      20,
 		AverageDailySales: 5,
@@ -100,7 +101,7 @@ func TestUpdateProductStock_InvalidFieldAfterUpdate(t *testing.T) {
 	uc := usecases.NewUpdateProductStockUseCase(repo)
 
 	negativeMinStock := -10
-	err := uc.Execute(usecases.UpdateProductStockDTO{
+	err := uc.Execute(context.Background(), usecases.UpdateProductStockDTO{
 		ID:           "uuid-1",
 		MinimumStock: &negativeMinStock,
 	})
@@ -118,7 +119,7 @@ func TestUpdateProductStock_AllFields(t *testing.T) {
 	existingProduct := &domain.ProductStock{
 		ID:                &id,
 		Name:              "Engine Oil",
-		Category:          domain.Engine,
+		Category:          "engine",
 		CurrentStock:      100,
 		MinimumStock:      20,
 		AverageDailySales: 5,
@@ -146,7 +147,7 @@ func TestUpdateProductStock_AllFields(t *testing.T) {
 	newCost := 50.0
 	newCriticality := 5
 
-	err := uc.Execute(usecases.UpdateProductStockDTO{
+	err := uc.Execute(context.Background(), usecases.UpdateProductStockDTO{
 		ID:                "uuid-1",
 		CurrentStock:      &newStock,
 		MinimumStock:      &newMinStock,
