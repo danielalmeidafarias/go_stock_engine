@@ -74,6 +74,27 @@ them manually:
 docker compose run --rm migrate
 ```
 
+#### Existing databases
+
+If the schema was created by the previous `AutoMigrate` flow, first confirm it
+matches migration `000001`, then mark that version as the baseline:
+
+```bash
+go run ./cmd/migrate -baseline-version=1
+```
+
+With Docker Compose, start only the database and run the baseline command without
+starting dependencies:
+
+```bash
+docker compose up -d db
+docker compose build app
+docker compose run --rm --no-deps app migrate -baseline-version=1
+```
+
+Do not use a baseline on an empty database or a schema that differs from the
+versioned migration.
+
 ### 4. Seed the database (optional)
 
 The API never seeds data during startup. To load the demonstration products into an empty database, run:
